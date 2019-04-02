@@ -60,14 +60,16 @@ namespace testD
             Session["_nextLoginTime"] = DateTime.Now;
 
         }
+
+
         private void CreateLead()
         {
 
             Lead l1 = new Lead();
-            l1.FirstName = "TestLead2";
-            l1.LastName = "APAPAPa";
-            l1.Company = "azea";
-            l1.Email = "A.azezaeazeaz@telecom.be";
+            l1.FirstName = "Samir";
+            l1.LastName = "Arwachi";
+            l1.Company = "ArwaCorp";
+            l1.Email = "S.Arw@corp.be";
 
 
             SaveResult[] createResult = _sForceRef.create(new sObject[] { l1 });
@@ -91,8 +93,8 @@ namespace testD
         {
 
             Contact c1 = new Contact();
-            c1.FirstName = "AbdelContact";
-            c1.LastName = "Alo";
+            c1.FirstName = "Samir";
+            c1.LastName = "Arwachi";
             c1.Email = "A.Alo@telecom.be";
 
 
@@ -142,7 +144,327 @@ namespace testD
 
 
         }
-        private void SearchLead(string searchingLead)
+
+
+
+        private string GetLeadID(string searchingLeadName, string searchingLeadEmail)
+        {
+            QueryResult qResult = null;
+            try
+            {
+                String soqlQuery = "SELECT Id FROM LEAD WHERE NAME='" + searchingLeadName + "' AND EMAIL = '" + searchingLeadEmail + "'";
+                qResult = _sForceRef.query(soqlQuery);
+                Boolean done = false;
+                if (qResult.size > 0)
+                {
+                    Response.Write("Logged-in user can see a total of "
+                       + qResult.size + " lead records.");
+                    while (!done)
+                    {
+                        sObject[] records = qResult.records;
+                        for (int i = 0; i < records.Length; ++i)
+                        {
+                            Lead l1 = (Lead)records[i];
+                            String id = l1.Id;
+                            if (id != null)
+                            {
+                                Response.Write("Lead " + searchingLeadName + " " + (i + 1) + ": " + id);
+                                return id;
+                            }
+                            else
+                            {
+                                Response.Write("Lead " + searchingLeadName + " " + (i + 1) + ": " + "ERROR");
+                                return null;
+                            }
+
+                        }
+                        if (qResult.done)
+                        {
+                            done = true;
+                        }
+                        else
+                        {
+                            qResult = _sForceRef.queryMore(qResult.queryLocator);
+                        }
+                    }
+                }
+                else
+                {
+                    Response.Write("No records found.");
+                    return null;
+
+                }
+                Response.Write("\nQuery succesfully executed.");
+                return null;
+
+            }
+            catch (SoapException e)
+            {
+                Response.Write("An unexpected error has occurred: " +
+                                           e.Message + "\n" + e.StackTrace);
+                return null;
+
+            }
+
+        }
+        private string GetAccountID(string searchingAccountName, string searchingAccountPhone)
+        {
+            QueryResult qResult = null;
+            try
+            {
+                String soqlQuery = "SELECT Id FROM ACCOUNT WHERE NAME='" + searchingAccountName + "' AND PHONE = '" + searchingAccountPhone + "'";
+                qResult = _sForceRef.query(soqlQuery);
+                Boolean done = false;
+                if (qResult.size > 0)
+                {
+                    Response.Write("Logged-in user can see a total of "
+                       + qResult.size + " account records.");
+                    while (!done)
+                    {
+                        sObject[] records = qResult.records;
+                        for (int i = 0; i < records.Length; ++i)
+                        {
+                            Account a1 = (Account)records[i];
+                            string id = a1.Id;
+                            if (id != null)
+                            {
+                                Response.Write("Account " + searchingAccountName + " " + (i + 1) + ": " + id);
+                                return id;
+                            }
+                            else
+                            {
+                                Response.Write("Account " + searchingAccountName + " " + (i + 1) + ": " + "ERROR");
+                                return null;
+                            }
+
+                        }
+                        if (qResult.done)
+                        {
+                            done = true;
+                        }
+                        else
+                        {
+                            qResult = _sForceRef.queryMore(qResult.queryLocator);
+                        }
+                    }
+                }
+                else
+                {
+                    Response.Write("No records found.");
+                    return null;
+
+                }
+                Response.Write("\nQuery succesfully executed.");
+                return null;
+
+            }
+            catch (SoapException e)
+            {
+                Response.Write("An unexpected error has occurred: " +
+                                           e.Message + "\n" + e.StackTrace);
+                return null;
+
+            }
+
+        }
+        //accounts deleten waarvan contacten of opportunities nog aan gekoppeld zijn gaat niet!
+        private string GetContactID(string searchingContactName, string searchingContactEmail)
+        {
+            QueryResult qResult = null;
+            try
+            {
+                String soqlQuery = "SELECT Id FROM CONTACT WHERE NAME='" + searchingContactName + "' AND EMAIL = '" + searchingContactEmail + "'";
+                qResult = _sForceRef.query(soqlQuery);
+                Boolean done = false;
+                if (qResult.size > 0)
+                {
+                    Response.Write("Logged-in user can see a total of "
+                       + qResult.size + " contact records.");
+                    while (!done)
+                    {
+                        sObject[] records = qResult.records;
+                        for (int i = 0; i < records.Length; ++i)
+                        {
+                            Contact c1 = (Contact)records[i];
+                            String id = c1.Id;
+                            if (id != null)
+                            {
+                                Response.Write("Contact " + searchingContactName + " " + (i + 1) + ": " + id);
+                                return id;
+                            }
+                            else
+                            {
+                                Response.Write("Contact " + searchingContactName + " " + (i + 1) + ": " + "ERROR");
+                                return null;
+                            }
+
+                        }
+                        if (qResult.done)
+                        {
+                            done = true;
+                        }
+                        else
+                        {
+                            qResult = _sForceRef.queryMore(qResult.queryLocator);
+                        }
+                    }
+                }
+                else
+                {
+                    Response.Write("No records found.");
+                    return null;
+
+                }
+                Response.Write("\nQuery succesfully executed.");
+                return null;
+
+            }
+            catch (SoapException e)
+            {
+                Response.Write("An unexpected error has occurred: " +
+                                           e.Message + "\n" + e.StackTrace);
+                return null;
+
+            }
+
+        }
+
+
+
+        private void Delete(string id)
+        {
+            string[] ids = new string[1];
+            ids[0] = id;
+
+            try
+            {
+                if (ids[0] != null)
+                {
+                    DeleteResult[] deleteResults = _sForceRef.delete(ids);
+                    for (int i = 0; i < deleteResults.Length; i++)
+                    {
+                        DeleteResult deleteResult = deleteResults[i];
+                        if (deleteResult.success)
+                        {
+                            Response.Write("Deleted Record ID: " + deleteResult.id);
+                        }
+                        else
+                        {
+                            // Handle the errors.
+                            // We just print the first error out for sample purposes.
+                            Error[] errors = deleteResult.errors;
+                            if (errors.Length > 0)
+                            {
+                                Response.Write("Error: could not delete " + "Record ID "
+                                      + deleteResult.id + ".");
+                                Response.Write("   The error reported was: ("
+                                      + errors[0].statusCode + ") "
+                                      + errors[0].message + "\n");
+                            }
+                        }
+                    }
+
+                }
+                else
+                {
+                    Response.Write("Error...");
+                }
+            }
+            catch (SoapException e)
+            {
+                Response.Write("An unexpected error has occurred: " +
+                                        e.Message + "\n" + e.StackTrace);
+            }
+        }
+
+
+        //____ CONVERTLEAD ___ NOG ___ NIET ___ VOLLEDIG ___ WERKEND ____//
+        private string [] convertLeadToContact()
+        {
+
+            
+                String[] result = new String[4];
+                try
+                {
+                    // Create two leads to convert
+                    Lead[] leads = new Lead[2];
+                    Lead lead = new Lead();
+                    lead.LastName = "Mallard";
+                    lead.FirstName = "Jay";
+                    lead.Company = "Wingo Ducks";
+                    lead.Phone = "(707) 555-0328";
+                    leads[0] = lead;
+                    lead = new Lead();
+                    lead.LastName = "Platypus";
+                    lead.FirstName = "Ogden";
+                    lead.Company = "Denio Water Co.";
+                    lead.Phone = "(775) 555-1245";
+                    leads[1] = lead;
+                    SaveResult[] saveResults = _sForceRef.create(leads);
+
+                    // Create a LeadConvert array to be used
+                    //   in the convertLead() call
+                    LeadConvert[] leadsToConvert =
+                          new LeadConvert[saveResults.Length]; ;
+                    for (int i = 0; i < saveResults.Length; ++i)
+                    {
+                        if (saveResults[i].success)
+                        {
+                            Console.WriteLine("Created new Lead: " +
+                                  saveResults[i].id);
+                            leadsToConvert[i] = new LeadConvert();
+                            leadsToConvert[i].convertedStatus = "Closed - Converted";
+                            leadsToConvert[i].leadId = saveResults[i].id;
+                            result[0] = saveResults[i].id;
+                        }
+                        else
+                        {
+                            Console.WriteLine("\nError creating new Lead: " +
+                                  saveResults[i].errors[0].message);
+                        }
+                    }
+                    // Convert the leads and iterate through the results
+                    LeadConvertResult[] lcResults =
+                          _sForceRef.convertLead(leadsToConvert);
+                    for (int j = 0; j < lcResults.Length; ++j)
+                    {
+                        if (lcResults[j].success)
+                        {
+                            Console.WriteLine("Lead converted successfully!");
+                            Console.WriteLine("Account ID: " +
+                                     lcResults[j].accountId);
+                            Console.WriteLine("Contact ID: " +
+                                     lcResults[j].contactId);
+                            Console.WriteLine("Opportunity ID: " +
+                                     lcResults[j].opportunityId);
+                        }
+                        else
+                        {
+                            Console.WriteLine("\nError converting new Lead: " +
+                                  lcResults[j].errors[0].message);
+                        }
+                    }
+                }
+                catch (SoapException e)
+                {
+                    Console.WriteLine("An unexpected error has occurred: " +
+                                      e.Message + "\n" + e.StackTrace);
+                }
+                return result;
+            
+
+
+        }
+
+        
+
+
+
+
+
+
+
+       /*private void SearchLead(string searchingLead)
         {
             SearchResult sResult = _sForceRef.search("FIND {" + searchingLead + "} IN Name FIELDS RETURNING" + " Lead(Id, Name)");
 
@@ -169,8 +491,8 @@ namespace testD
 
             }
 
-        }
-        private string SearchLeadID(string searchingLead)
+        }*/
+       /* private string SearchLeadID(string searchingLead)
         {
             SearchResult sResult = _sForceRef.search("FIND {" + searchingLead + "} IN Name FIELDS RETURNING" + " Lead(Id)");
 
@@ -200,41 +522,7 @@ namespace testD
 
 
             return testIDLead;
-        }
-        private void DeleteLead(string [] ids)
-        {
-            try
-            {
-                DeleteResult[] deleteResults = _sForceRef.delete(ids);
-                for (int i = 0; i < deleteResults.Length; i++)
-                {
-                    DeleteResult deleteResult = deleteResults[i];
-                    if (deleteResult.success)
-                    {
-                        Console.WriteLine("Deleted Record ID: " + deleteResult.id);
-                    }
-                    else
-                    {
-                        // Handle the errors.
-                        // We just print the first error out for sample purposes.
-                        Error[] errors = deleteResult.errors;
-                        if (errors.Length > 0)
-                        {
-                            Console.WriteLine("Error: could not delete " + "Record ID "
-                                  + deleteResult.id + ".");
-                            Console.WriteLine("   The error reported was: ("
-                                  + errors[0].statusCode + ") "
-                                  + errors[0].message + "\n");
-                        }
-                    }
-                }
-            }
-            catch (SoapException e)
-            {
-                Console.WriteLine("An unexpected error has occurred: " +
-                                        e.Message + "\n" + e.StackTrace);
-            }
-        }
+        }*/
 
 
 
@@ -259,17 +547,18 @@ namespace testD
             //CreateLead();
             //CreateContact();
             //CreateAccount();
-            //SearchLeadID(searchLeadX);
 
-            string searchLeadX = "Drilon Kryeziu";
-            string idTESTA = SearchLeadID(searchLeadX);
-            Response.Write("<br/>@@@@@@@@@@@@@@@@Id:" + idTESTA + "<br/>__________________<br/>");
-            SearchLead(searchLeadX);
-            string[] ids=new string[1];
 
-            ids[0] = idTESTA;
 
-           // DeleteLead(ids);
+
+            //string id=GetLeadID("Bertha Boxer", "blabla@gmail.com");
+            //Delete(id);
+
+            //string id = GetAccountID("Edge Communications", "(512) 757-6000");
+            //Delete(id);
+
+            //string id=GetContactID("firstnameContactTwee lastnameContactTwee", "");
+            //Delete(id);
 
 
 
