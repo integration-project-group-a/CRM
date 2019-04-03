@@ -441,6 +441,133 @@ namespace testD
 
 
         }
+        private Contact GetContact(string searchingContactName, string searchingContactEmail)
+        {
+
+            QueryResult qResult = null;
+            try
+            {
+                String soqlQuery = "SELECT FirstName, LastName, Id, email, status, phone FROM CONTACT WHERE NAME='" + searchingContactName + "' AND EMAIL = '" + searchingContactEmail + "'";
+                qResult = _sForceRef.query(soqlQuery);
+                Boolean done = false;
+                if (qResult.size > 0)
+                {
+                    Response.Write("Logged-in user can see a total of "
+                       + qResult.size + " contact records.");
+                    while (!done)
+                    {
+                        sObject[] records = qResult.records;
+                        for (int i = 0; i < records.Length; ++i)
+                        {
+                            Contact c1 = (Contact)records[i];
+
+                            if (c1 != null)
+                            {
+                                Response.Write("Contact " + searchingContactName + " found");
+                                return c1;
+                            }
+                            else
+                            {
+                                Response.Write("Contact " + searchingContactName + " " + (i + 1) + ": " + "ERROR");
+                                return null;
+                            }
+
+                        }
+                        if (qResult.done)
+                        {
+                            done = true;
+                        }
+                        else
+                        {
+                            qResult = _sForceRef.queryMore(qResult.queryLocator);
+                        }
+                    }
+                }
+                else
+                {
+                    Response.Write("No records found.");
+                    return null;
+
+                }
+                Response.Write("\nQuery succesfully executed.");
+                return null;
+
+            }
+            catch (SoapException e)
+            {
+                Response.Write("An unexpected error has occurred: " +
+                                           e.Message + "\n" + e.StackTrace);
+                return null;
+
+            }
+
+
+
+        }
+        private Account GetAccount(string searchingAccountName, string searchingAccountPhone)
+        {
+
+            QueryResult qResult = null;
+            try
+            {
+                String soqlQuery = "SELECT FirstName, LastName, Id, email, status, phone FROM ACCOUNT WHERE NAME='" + searchingAccountName + "' AND PHONE = '" + searchingAccountPhone + "'";
+                qResult = _sForceRef.query(soqlQuery);
+                Boolean done = false;
+                if (qResult.size > 0)
+                {
+                    Response.Write("Logged-in user can see a total of "
+                       + qResult.size + " account records.");
+                    while (!done)
+                    {
+                        sObject[] records = qResult.records;
+                        for (int i = 0; i < records.Length; ++i)
+                        {
+                            Account a1 = (Account)records[i];
+
+                            if (a1 != null)
+                            {
+                                Response.Write("Account " + searchingAccountName + " found");
+                                return a1;
+                            }
+                            else
+                            {
+                                Response.Write("Account " + searchingAccountName + " " + (i + 1) + ": " + "ERROR");
+                                return null;
+                            }
+
+                        }
+                        if (qResult.done)
+                        {
+                            done = true;
+                        }
+                        else
+                        {
+                            qResult = _sForceRef.queryMore(qResult.queryLocator);
+                        }
+                    }
+                }
+                else
+                {
+                    Response.Write("No records found.");
+                    return null;
+
+                }
+                Response.Write("\nQuery succesfully executed.");
+                return null;
+
+            }
+            catch (SoapException e)
+            {
+                Response.Write("An unexpected error has occurred: " +
+                                           e.Message + "\n" + e.StackTrace);
+                return null;
+
+            }
+
+
+
+        }
+
         //____ CONVERTLEAD __ WERKEND ___?? Lead->Contact (gaat eveneens een account en een opportunity aanmaken( dmv company))_//
         private string [] convertLeadToContact()
         {
@@ -502,7 +629,56 @@ namespace testD
         }
 
         
+        private void updateRecord(String[] ids)
+        {
+                Account[] updates = new Account[2];
 
+                Account account1 = new Account();
+                account1.Id = ids[0];
+                account1.ShippingPostalCode = "89044";
+                updates[0] = account1;
+
+                Account account2 = new Account();
+                account2.Id = ids[1];
+                account2.NumberOfEmployees = 1000;
+                updates[1] = account2;
+
+                // Invoke the update call and save the results
+                try
+                {
+                    SaveResult[] saveResults = _sForceRef.update(updates);
+                    foreach (SaveResult saveResult in saveResults)
+                    {
+                        if (saveResult.success)
+                        {
+                            Console.WriteLine("Successfully updated Account ID: " +
+                                  saveResult.id);
+                        }
+                        else
+                        {
+                            // Handle the errors.
+                            // We just print the first error out for sample purposes.
+                            Error[] errors = saveResult.errors;
+                            if (errors.Length > 0)
+                            {
+                                Console.WriteLine("Error: could not update " +
+                                      "Account ID " + saveResult.id + "."
+                                );
+                                Console.WriteLine("\tThe error reported was: (" +
+                                      errors[0].statusCode + ") " +
+                                      errors[0].message + "."
+                                );
+                            }
+                        }
+                    }
+                }
+                catch (SoapException e)
+                {
+                    Console.WriteLine("An unexpected error has occurred: " +
+                                               e.Message + "\n" + e.StackTrace);
+                }
+            
+        }
 
 
 
