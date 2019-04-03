@@ -66,10 +66,10 @@ namespace testD
         {
 
             Lead l1 = new Lead();
-            l1.FirstName = "Samir";
-            l1.LastName = "Arwachi";
-            l1.Company = "ArwaCorp";
-            l1.Email = "S.Arw@corp.be";
+            l1.FirstName = "Tommy";
+            l1.LastName = "Shelby";
+            l1.Company = "compCorp";
+            l1.Email = "S@compcorp.be";
 
 
             SaveResult[] createResult = _sForceRef.create(new sObject[] { l1 });
@@ -378,50 +378,95 @@ namespace testD
         }
 
 
-        //____ CONVERTLEAD ___ NOG ___ NIET ___ VOLLEDIG ___ WERKEND ____//
+        private Lead GetLead(string searchingLeadName, string searchingLeadEmail)
+        {
+
+            QueryResult qResult = null;
+            try
+            {
+                String soqlQuery = "SELECT FirstName, LastName, Id, email, status, phone FROM LEAD WHERE NAME='" + searchingLeadName + "' AND EMAIL = '" + searchingLeadEmail + "'";
+                qResult = _sForceRef.query(soqlQuery);
+                Boolean done = false;
+                if (qResult.size > 0)
+                {
+                    Response.Write("Logged-in user can see a total of "
+                       + qResult.size + " lead records.");
+                    while (!done)
+                    {
+                        sObject[] records = qResult.records;
+                        for (int i = 0; i < records.Length; ++i)
+                        {
+                            Lead l1 = (Lead)records[i];
+                            
+                            if (l1 != null)
+                            {
+                                Response.Write("Lead " + searchingLeadName + " found");
+                                return l1;
+                            }
+                            else
+                            {
+                                Response.Write("Lead " + searchingLeadName + " " + (i + 1) + ": " + "ERROR");
+                                return null;
+                            }
+
+                        }
+                        if (qResult.done)
+                        {
+                            done = true;
+                        }
+                        else
+                        {
+                            qResult = _sForceRef.queryMore(qResult.queryLocator);
+                        }
+                    }
+                }
+                else
+                {
+                    Response.Write("No records found.");
+                    return null;
+
+                }
+                Response.Write("\nQuery succesfully executed.");
+                return null;
+
+            }
+            catch (SoapException e)
+            {
+                Response.Write("An unexpected error has occurred: " +
+                                           e.Message + "\n" + e.StackTrace);
+                return null;
+
+            }
+
+
+
+        }
+        //____ CONVERTLEAD __ WERKEND ___?? Lead->Contact (gaat eveneens een account en een opportunity aanmaken( dmv company))_//
         private string [] convertLeadToContact()
         {
 
+            
             
                 String[] result = new String[4];
                 try
                 {
                     // Create two leads to convert
-                    Lead[] leads = new Lead[2];
-                    Lead lead = new Lead();
-                    lead.LastName = "Mallard";
-                    lead.FirstName = "Jay";
-                    lead.Company = "Wingo Ducks";
-                    lead.Phone = "(707) 555-0328";
-                    leads[0] = lead;
-                    lead = new Lead();
-                    lead.LastName = "Platypus";
-                    lead.FirstName = "Ogden";
-                    lead.Company = "Denio Water Co.";
-                    lead.Phone = "(775) 555-1245";
-                    leads[1] = lead;
-                    SaveResult[] saveResults = _sForceRef.create(leads);
+                    Lead[] leads = new Lead[1];
+                  
+                    leads[0] = GetLead("Tommy Shelby", "S@compcorp.be");
 
                     // Create a LeadConvert array to be used
                     //   in the convertLead() call
                     LeadConvert[] leadsToConvert =
-                          new LeadConvert[saveResults.Length]; ;
-                    for (int i = 0; i < saveResults.Length; ++i)
+                          new LeadConvert[leads.Length]; ;
+                    for (int i = 0; i < leads.Length; ++i)
                     {
-                        if (saveResults[i].success)
-                        {
-                            Console.WriteLine("Created new Lead: " +
-                                  saveResults[i].id);
+                       
                             leadsToConvert[i] = new LeadConvert();
                             leadsToConvert[i].convertedStatus = "Closed - Converted";
-                            leadsToConvert[i].leadId = saveResults[i].id;
-                            result[0] = saveResults[i].id;
-                        }
-                        else
-                        {
-                            Console.WriteLine("\nError creating new Lead: " +
-                                  saveResults[i].errors[0].message);
-                        }
+                            leadsToConvert[i].leadId = leads[i].Id;
+                            result[0] = leads[i].Id;
+                       
                     }
                     // Convert the leads and iterate through the results
                     LeadConvertResult[] lcResults =
@@ -430,24 +475,24 @@ namespace testD
                     {
                         if (lcResults[j].success)
                         {
-                            Console.WriteLine("Lead converted successfully!");
-                            Console.WriteLine("Account ID: " +
+                        Response.Write("Lead converted successfully!");
+                        Response.Write("Account ID: " +
                                      lcResults[j].accountId);
-                            Console.WriteLine("Contact ID: " +
+                        Response.Write("Contact ID: " +
                                      lcResults[j].contactId);
-                            Console.WriteLine("Opportunity ID: " +
+                        Response.Write("Opportunity ID: " +
                                      lcResults[j].opportunityId);
                         }
                         else
                         {
-                            Console.WriteLine("\nError converting new Lead: " +
+                        Response.Write("\nError converting new Lead: " +
                                   lcResults[j].errors[0].message);
                         }
                     }
                 }
                 catch (SoapException e)
                 {
-                    Console.WriteLine("An unexpected error has occurred: " +
+                Response.Write("An unexpected error has occurred: " +
                                       e.Message + "\n" + e.StackTrace);
                 }
                 return result;
@@ -562,6 +607,8 @@ namespace testD
 
 
 
+            //CreateLead();
+            Response.Write(convertLeadToContact());
 
 
 
