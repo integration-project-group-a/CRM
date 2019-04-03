@@ -629,19 +629,20 @@ namespace testD
         }
 
         
-        private void updateRecord(String[] ids)
+        private void updateRecordAccount(String idAccount)
         {
-                Account[] updates = new Account[2];
+                Account[] updates = new Account[1];
+                
+
+            
 
                 Account account1 = new Account();
-                account1.Id = ids[0];
-                account1.ShippingPostalCode = "89044";
+                account1.Id = idAccount;
+
+                account1.Name = "Geupdate Naam";
+
                 updates[0] = account1;
 
-                Account account2 = new Account();
-                account2.Id = ids[1];
-                account2.NumberOfEmployees = 1000;
-                updates[1] = account2;
 
                 // Invoke the update call and save the results
                 try
@@ -651,7 +652,7 @@ namespace testD
                     {
                         if (saveResult.success)
                         {
-                            Console.WriteLine("Successfully updated Account ID: " +
+                        Response.Write("Successfully updated Account ID: " +
                                   saveResult.id);
                         }
                         else
@@ -661,10 +662,10 @@ namespace testD
                             Error[] errors = saveResult.errors;
                             if (errors.Length > 0)
                             {
-                                Console.WriteLine("Error: could not update " +
+                            Response.Write("Error: could not update " +
                                       "Account ID " + saveResult.id + "."
                                 );
-                                Console.WriteLine("\tThe error reported was: (" +
+                            Response.Write("\tThe error reported was: (" +
                                       errors[0].statusCode + ") " +
                                       errors[0].message + "."
                                 );
@@ -674,76 +675,174 @@ namespace testD
                 }
                 catch (SoapException e)
                 {
-                    Console.WriteLine("An unexpected error has occurred: " +
+                Response.Write("An unexpected error has occurred: " +
                                                e.Message + "\n" + e.StackTrace);
                 }
             
         }
 
-
-
-
-
-
-       /*private void SearchLead(string searchingLead)
+        private void updateRecordLead(String idLead)
         {
-            SearchResult sResult = _sForceRef.search("FIND {" + searchingLead + "} IN Name FIELDS RETURNING" + " Lead(Id, Name)");
+            Lead[] updates = new Lead[1];
 
-            SearchRecord[] recs = sResult.searchRecords;
 
-            List<Lead> leads = new List<Lead>();
 
-            if (recs.Length > 0)
+
+            Lead lead1 = new Lead();
+            lead1.Id = idLead;
+
+            lead1.FirstName = "Abdel";
+            lead1.LastName = "BenLead";
+
+            updates[0] = lead1;
+
+
+            try
             {
-                for (int i = 0; i < recs.Length; i++)
+                SaveResult[] saveResults = _sForceRef.update(updates);
+                foreach (SaveResult saveResult in saveResults)
                 {
-                    sObject rec = recs[i].record;
-                    if (rec is Lead)
+                    if (saveResult.success)
                     {
-                        leads.Add((Lead)rec);
+                        Response.Write("Successfully updated Lead ID: " +
+                                  saveResult.id);
+                    }
+                    else
+                    {
+                        Error[] errors = saveResult.errors;
+                        if (errors.Length > 0)
+                        {
+                            Response.Write("Error: could not update " +
+                                      "Lead ID " + saveResult.id + "."
+                                );
+                            Response.Write("\tThe error reported was: (" +
+                                      errors[0].statusCode + ") " +
+                                      errors[0].message + "."
+                                );
+                        }
                     }
                 }
             }
-
-
-            foreach (var l in leads)
+            catch (SoapException e)
             {
-                Response.Write("<br/>Id:" + l.Id + "<br/>" + "Name:" + l.Name + "<br/>__________________<br/>");
-
+                Response.Write("An unexpected error has occurred: " +
+                                               e.Message + "\n" + e.StackTrace);
             }
 
-        }*/
-       /* private string SearchLeadID(string searchingLead)
+        }
+
+        private void updateRecordContact(String idContact)
         {
-            SearchResult sResult = _sForceRef.search("FIND {" + searchingLead + "} IN Name FIELDS RETURNING" + " Lead(Id)");
+            Contact[] updates = new Contact[1];
 
-            SearchRecord[] recs = sResult.searchRecords;
 
-            List<Lead> leads = new List<Lead>();
 
-            if (recs.Length > 0)
+
+            Contact contact1 = new Contact();
+            contact1.Id = idContact;
+
+            contact1.FirstName = "Thomas";
+            contact1.LastName = "Shelby";
+
+            updates[0] = contact1;
+
+
+            try
             {
-                for (int i = 0; i < recs.Length; i++)
+                SaveResult[] saveResults = _sForceRef.update(updates);
+                foreach (SaveResult saveResult in saveResults)
                 {
-                    sObject rec = recs[i].record;
-                    if (rec is Lead)
+                    if (saveResult.success)
                     {
-                        leads.Add((Lead)rec);
+                        Response.Write("Successfully updated Contact ID: " +
+                                  saveResult.id);
+                    }
+                    else
+                    {
+                        Error[] errors = saveResult.errors;
+                        if (errors.Length > 0)
+                        {
+                            Response.Write("Error: could not update " +
+                                      "Contact ID " + saveResult.id + "."
+                                );
+                            Response.Write("\tThe error reported was: (" +
+                                      errors[0].statusCode + ") " +
+                                      errors[0].message + "."
+                                );
+                        }
                     }
                 }
             }
-
-            string testIDLead = "";
-
-            foreach (var l in leads)
+            catch (SoapException e)
             {
-                Response.Write("<br/>Id:" + l.Id + "<br/>" + "_________<br/>__________________<br/>");
-                testIDLead = l.Id;
+                Response.Write("An unexpected error has occurred: " +
+                                               e.Message + "\n" + e.StackTrace);
             }
 
+        }
 
-            return testIDLead;
-        }*/
+
+
+
+        /*private void SearchLead(string searchingLead)
+         {
+             SearchResult sResult = _sForceRef.search("FIND {" + searchingLead + "} IN Name FIELDS RETURNING" + " Lead(Id, Name)");
+
+             SearchRecord[] recs = sResult.searchRecords;
+
+             List<Lead> leads = new List<Lead>();
+
+             if (recs.Length > 0)
+             {
+                 for (int i = 0; i < recs.Length; i++)
+                 {
+                     sObject rec = recs[i].record;
+                     if (rec is Lead)
+                     {
+                         leads.Add((Lead)rec);
+                     }
+                 }
+             }
+
+
+             foreach (var l in leads)
+             {
+                 Response.Write("<br/>Id:" + l.Id + "<br/>" + "Name:" + l.Name + "<br/>__________________<br/>");
+
+             }
+
+         }*/
+        /* private string SearchLeadID(string searchingLead)
+         {
+             SearchResult sResult = _sForceRef.search("FIND {" + searchingLead + "} IN Name FIELDS RETURNING" + " Lead(Id)");
+
+             SearchRecord[] recs = sResult.searchRecords;
+
+             List<Lead> leads = new List<Lead>();
+
+             if (recs.Length > 0)
+             {
+                 for (int i = 0; i < recs.Length; i++)
+                 {
+                     sObject rec = recs[i].record;
+                     if (rec is Lead)
+                     {
+                         leads.Add((Lead)rec);
+                     }
+                 }
+             }
+
+             string testIDLead = "";
+
+             foreach (var l in leads)
+             {
+                 Response.Write("<br/>Id:" + l.Id + "<br/>" + "_________<br/>__________________<br/>");
+                 testIDLead = l.Id;
+             }
+
+
+             return testIDLead;
+         }*/
 
 
 
@@ -782,18 +881,17 @@ namespace testD
             //Delete(id);
 
 
+            //updateRecordAccount(GetAccountID("sForce", "(415) 901-7000"));
+
+            //updateRecordLead(GetLeadID("AbdelLead Alo", "a.alo@telecom.be"));
+
+            //updateRecordContact(GetContactID("Tommy Shelby", "s@compcorp.be"));
 
             //CreateLead();
-            Response.Write(convertLeadToContact());
+            //Response.Write(convertLeadToContact());
 
 
 
-            //________________________________________//
-            //LeadConvert[] leadToConvert = new LeadConvert[0];
-
-            //leadToConvert[0] = new LeadConvert();
-            //leadToConvert[0].convertedStatus = "Closed - Converted";
-            //_________________________________________//
 
 
 
