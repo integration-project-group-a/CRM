@@ -7,10 +7,17 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using testD.Sfdc;
 
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
+using System.Text;
+using System.Xml;
+
+
 namespace testD
 {
     public partial class Test : System.Web.UI.Page
     {
+
 
         private string username = "anas.ahraoui@student.ehb.be";
         private string password = "SVdbERAM1032";
@@ -23,10 +30,6 @@ namespace testD
         private SforceService _sForceRef = new SforceService();
 
 
-        protected void Page_Load(object sender, EventArgs e)
-        {
-
-        }
 
 
 
@@ -62,45 +65,48 @@ namespace testD
         }
 
 
-        private void CreateLead()
+        private void CreateLead(string firstName, string lastName, string email,string bedrijfNaam, string gsm)
         {
 
             Lead l1 = new Lead();
-            l1.FirstName = "Tommy";
-            l1.LastName = "Shelby";
-            l1.Company = "compCorp";
-            l1.Email = "S@compcorp.be";
-
+            l1.FirstName = firstName;
+            l1.LastName = lastName;
+            l1.Company = bedrijfNaam;
+            l1.Email = email;
+            l1.Phone = gsm;
 
             SaveResult[] createResult = _sForceRef.create(new sObject[] { l1 });
 
             if (createResult[0].success)
             {
                 string id = createResult[0].id;
-                Response.Write("<br/>Id:" + id);
-                Response.Write("Lead + " + id + " succesfully added ");
+                //Response.Write("<br/>Id:" + id);
+                //Response.Write("Lead + " + id + " succesfully added ");
 
             }
             else
             {
                 string resultaat = createResult[0].errors[0].message;
-                Response.Write("<br/> Error, Lead not added <br/>" + resultaat);
+                //Response.Write("<br/> Error, Lead not added <br/>" + resultaat);
             }
 
 
         }
-        private void CreateContact()
+        private void CreateContact(string firstName,string lastName,string email/*,string btwnr*/,string gsm)
         {
 
             Contact c1 = new Contact();
-            c1.FirstName = "Samir";
-            c1.LastName = "Arwachi";
-            c1.Email = "A.Alo@telecom.be";
+            c1.FirstName = firstName;
+            c1.LastName = lastName;
+            c1.Email = email;
+            c1.Phone = gsm;
 
 
-            SaveResult[] createResult = _sForceRef.create(new sObject[] { c1 });
+            SaveResult[] createResult; 
 
-            if (createResult[0].success)
+            createResult= _sForceRef.create(new sObject[] { c1 });
+
+            if (createResult[0].success == true)
             {
                 string id = createResult[0].id;
                 Response.Write("<br/>Id:" + id);
@@ -113,6 +119,7 @@ namespace testD
                 Response.Write("<br/> Error, Contact could not be added <br/>" + resultaat);
             }
 
+            Response.Write("Contact succesfully added ");
 
         }
         private void CreateAccount()
@@ -397,7 +404,7 @@ namespace testD
                         for (int i = 0; i < records.Length; ++i)
                         {
                             Lead l1 = (Lead)records[i];
-                            
+
                             if (l1 != null)
                             {
                                 Response.Write("Lead " + searchingLeadName + " found");
@@ -569,39 +576,39 @@ namespace testD
         }
 
         //____ CONVERTLEAD __ WERKEND ___?? Lead->Contact (gaat eveneens een account en een opportunity aanmaken( dmv company))_//
-        private string [] convertLeadToContact()
+        private string[] convertLeadToContact()
         {
 
-            
-            
-                String[] result = new String[4];
-                try
-                {
-                    // Create two leads to convert
-                    Lead[] leads = new Lead[1];
-                  
-                    leads[0] = GetLead("Tommy Shelby", "S@compcorp.be");
 
-                    // Create a LeadConvert array to be used
-                    //   in the convertLead() call
-                    LeadConvert[] leadsToConvert =
-                          new LeadConvert[leads.Length]; ;
-                    for (int i = 0; i < leads.Length; ++i)
+
+            String[] result = new String[4];
+            try
+            {
+                // Create two leads to convert
+                Lead[] leads = new Lead[1];
+
+                leads[0] = GetLead("Tommy Shelby", "S@compcorp.be");
+
+                // Create a LeadConvert array to be used
+                //   in the convertLead() call
+                LeadConvert[] leadsToConvert =
+                      new LeadConvert[leads.Length]; ;
+                for (int i = 0; i < leads.Length; ++i)
+                {
+
+                    leadsToConvert[i] = new LeadConvert();
+                    leadsToConvert[i].convertedStatus = "Closed - Converted";
+                    leadsToConvert[i].leadId = leads[i].Id;
+                    result[0] = leads[i].Id;
+
+                }
+                // Convert the leads and iterate through the results
+                LeadConvertResult[] lcResults =
+                      _sForceRef.convertLead(leadsToConvert);
+                for (int j = 0; j < lcResults.Length; ++j)
+                {
+                    if (lcResults[j].success)
                     {
-                       
-                            leadsToConvert[i] = new LeadConvert();
-                            leadsToConvert[i].convertedStatus = "Closed - Converted";
-                            leadsToConvert[i].leadId = leads[i].Id;
-                            result[0] = leads[i].Id;
-                       
-                    }
-                    // Convert the leads and iterate through the results
-                    LeadConvertResult[] lcResults =
-                          _sForceRef.convertLead(leadsToConvert);
-                    for (int j = 0; j < lcResults.Length; ++j)
-                    {
-                        if (lcResults[j].success)
-                        {
                         Response.Write("Lead converted successfully!");
                         Response.Write("Account ID: " +
                                      lcResults[j].accountId);
@@ -609,59 +616,59 @@ namespace testD
                                      lcResults[j].contactId);
                         Response.Write("Opportunity ID: " +
                                      lcResults[j].opportunityId);
-                        }
-                        else
-                        {
+                    }
+                    else
+                    {
                         Response.Write("\nError converting new Lead: " +
                                   lcResults[j].errors[0].message);
-                        }
                     }
                 }
-                catch (SoapException e)
-                {
+            }
+            catch (SoapException e)
+            {
                 Response.Write("An unexpected error has occurred: " +
                                       e.Message + "\n" + e.StackTrace);
-                }
-                return result;
-            
+            }
+            return result;
+
 
 
         }
 
-        
+
         private void updateRecordAccount(String idAccount)
         {
-                Account[] updates = new Account[1];
-                
-
-            
-
-                Account account1 = new Account();
-                account1.Id = idAccount;
-
-                account1.Name = "Geupdate Naam";
-
-                updates[0] = account1;
+            Account[] updates = new Account[1];
 
 
-                // Invoke the update call and save the results
-                try
+
+
+            Account account1 = new Account();
+            account1.Id = idAccount;
+
+            account1.Name = "Geupdate Naam";
+
+            updates[0] = account1;
+
+
+            // Invoke the update call and save the results
+            try
+            {
+                SaveResult[] saveResults = _sForceRef.update(updates);
+                foreach (SaveResult saveResult in saveResults)
                 {
-                    SaveResult[] saveResults = _sForceRef.update(updates);
-                    foreach (SaveResult saveResult in saveResults)
+                    if (saveResult.success)
                     {
-                        if (saveResult.success)
-                        {
                         Response.Write("Successfully updated Account ID: " +
                                   saveResult.id);
-                        }
-                        else
+                    }
+                    else
+                    {
+                        // Handle the errors.
+                        // We just print the first error out for sample purposes.
+                        Error[] errors = saveResult.errors;
+                        if (errors.Length > 0)
                         {
-                            // Handle the errors.
-                            // We just print the first error out for sample purposes.
-                            Error[] errors = saveResult.errors;
-                            if (errors.Length > 0)
-                            {
                             Response.Write("Error: could not update " +
                                       "Account ID " + saveResult.id + "."
                                 );
@@ -669,16 +676,16 @@ namespace testD
                                       errors[0].statusCode + ") " +
                                       errors[0].message + "."
                                 );
-                            }
                         }
                     }
                 }
-                catch (SoapException e)
-                {
+            }
+            catch (SoapException e)
+            {
                 Response.Write("An unexpected error has occurred: " +
                                                e.Message + "\n" + e.StackTrace);
-                }
-            
+            }
+
         }
 
         private void updateRecordLead(String idLead)
@@ -850,10 +857,16 @@ namespace testD
 
 
 
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+
+        }
 
 
         protected void Button1_Click(object sender, EventArgs e)
         {
+
 
             if (!IsConnected())
                 getSessionInformation();
@@ -861,6 +874,72 @@ namespace testD
             _sForceRef.Url = _loginResult.serverUrl;
             _sForceRef.SessionHeaderValue = new SessionHeader();
             _sForceRef.SessionHeaderValue.sessionId = _loginResult.sessionId;
+
+
+
+
+
+
+            var factory = new ConnectionFactory() { HostName = "localhost", UserName = "guest", Password = "guest", Port = 5672 };
+            using (var connection = factory.CreateConnection())
+            using (var channel = connection.CreateModel())
+            {
+                channel.QueueDeclare(queue: "CRM",
+                durable: false,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null);
+                var consumer = new EventingBasicConsumer(channel);
+                consumer.Received += (model, ea) =>
+                {
+                    var body = ea.Body;
+                    var message = Encoding.UTF8.GetString(body);
+                    Console.WriteLine(" [x] Received {0}", message);
+
+                    //XmlDocument doc = new XmlDocument();
+                    //doc.LoadXml(message);
+                    //XmlNodeList xmlList = doc.GetElementsByTagName("Message");
+                    //string messageType = xmlList[0].InnerText;
+                    
+                    switch (message)
+                    {
+                        case "create_lead":
+
+
+                            CreateLead("OliLead", "Colleadi", "dodoafeazfe@gmail.com", "BedrijfA","04585858");
+                            break;
+
+                        case "create_contact":
+
+
+                            CreateContact("OliContactD", "ColiDee", "dodo@gmalllil.com", "04858");
+                            break;
+
+                        case "erase_contact":
+
+                            CreateContact("OliContactD", "ColiDee", "dodo@gmalllil.com", "04858");
+                            break;
+
+                        case "erase_lead":
+
+                            CreateContact("OliContactD", "ColiDee", "dodo@gmalllil.com", "04858");
+                            break;
+
+                        default:
+                            Console.WriteLine("Invalid incoming message");
+                            break;
+
+                    }
+
+
+                };
+                channel.BasicConsume(queue: "CRM",
+                                autoAck: true,
+                                consumer: consumer);
+                Console.WriteLine(" Press [enter] to exit.");
+                Console.ReadLine();
+            }
+
 
 
 
