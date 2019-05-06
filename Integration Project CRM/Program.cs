@@ -46,7 +46,8 @@ namespace Integration_Project_CRM
             l1.birthdate__cSpecified = true;
             l1.birthdate__c = gebDatum;
 
-            l1.CompanyDunsNumber = btwNr;
+            
+            l1.btw__c = btwNr;
             l1.Phone = gsm;
 
             l1.gdpr__cSpecified = true;
@@ -133,18 +134,17 @@ namespace Integration_Project_CRM
 
 
 
-        private static string GetLeadID(SforceService _sForceRef, string searchingLeadName, string searchingLeadEmail)
+        private static string GetLeadID(SforceService _sForceRef,string uuid)
         {
             QueryResult qResult = null;
             try
             {
-                String soqlQuery = "SELECT Id FROM LEAD WHERE NAME='" + searchingLeadName + "' AND EMAIL = '" + searchingLeadEmail + "'";
+                String soqlQuery = "SELECT Id FROM LEAD WHERE UUID__c='" + uuid  +"'";
                 qResult = _sForceRef.query(soqlQuery);
                 Boolean done = false;
                 if (qResult.size > 0)
                 {
-                    Console.WriteLine("Logged-in user can see a total of "
-                       + qResult.size + " lead records.");
+                    Console.WriteLine("Record found...");
                     while (!done)
                     {
                         sObject[] records = qResult.records;
@@ -154,13 +154,13 @@ namespace Integration_Project_CRM
                             String id = l1.Id;
                             if (id != null)
                             {
-                                Console.WriteLine("Lead " + searchingLeadName + " " + (i + 1) + ": " + id);
+                                Console.WriteLine("Lead " + uuid +" --> id: " + id);
                                 return id;
                             }
                             else
                             {
-                                Console.WriteLine("Lead " + searchingLeadName + " " + (i + 1) + ": " + "ERROR");
-                                return null;
+                                Console.WriteLine("Lead " + uuid + " --> " + "ERROR");
+                                return "empty";
                             }
 
                         }
@@ -177,18 +177,18 @@ namespace Integration_Project_CRM
                 else
                 {
                     Console.WriteLine("No records found.");
-                    return null;
+                    return "empty";
 
                 }
                 Console.WriteLine("\nQuery succesfully executed.");
-                return null;
+                return "empty";
 
             }
             catch (SoapException e)
             {
                 Console.WriteLine("An unexpected error has occurred: " +
                                            e.Message + "\n" + e.StackTrace);
-                return null;
+                return "empty";
 
             }
 
@@ -364,13 +364,13 @@ namespace Integration_Project_CRM
         }
 
 
-        private static Lead GetLead(SforceService _sForceRef, string searchingLeadName, string searchingLeadEmail)
+        private static Lead GetLead(SforceService _sForceRef, string uuid)
         {
 
             QueryResult qResult = null;
             try
             {
-                String soqlQuery = "SELECT FirstName, LastName, Id, email, status, phone FROM LEAD WHERE NAME='" + searchingLeadName + "' AND EMAIL = '" + searchingLeadEmail + "'";
+                String soqlQuery = "SELECT  UUID__c, FirstName, LastName, Id, Email, Status, Timestamp__c, Version__c, IsActive__c, IsBanned__c, Company, Birthdate__c, btw__c, Phone, Gdpr__c FROM LEAD WHERE UUID__c='" + uuid + "'";
                 qResult = _sForceRef.query(soqlQuery);
                 Boolean done = false;
                 if (qResult.size > 0)
@@ -386,12 +386,12 @@ namespace Integration_Project_CRM
 
                             if (l1 != null)
                             {
-                                Console.WriteLine("Lead " + searchingLeadName + " found");
+                                Console.WriteLine("Lead " + uuid + " found");
                                 return l1;
                             }
                             else
                             {
-                                Console.WriteLine("Lead " + searchingLeadName + " " + (i + 1) + ": " + "ERROR");
+                                Console.WriteLine("Lead " + uuid + " " + (i + 1) + ": " + "ERROR");
                                 return null;
                             }
 
@@ -617,7 +617,7 @@ namespace Integration_Project_CRM
         }
 
 
-        private static void updateRecordLead(SforceService _sForceRef, String idLead, string uuid, string firstName, string lastName, string email, Int32 timestampLead, double versionLead, bool isActive, bool isBanned, string gsm, DateTime gebDatum, string btwNr, bool gdpr)
+        private static void updateRecordLead(SforceService _sForceRef,string messageType ,string idLead, string uuid, string firstName, string lastName, string email, Int32 timestampLead, double versionLead, bool isActive, bool isBanned, string gsm, DateTime gebDatum, string btwNr, bool gdpr)
         {
             Lead[] updates = new Lead[1];
 
@@ -646,12 +646,12 @@ namespace Integration_Project_CRM
             l1.IsBanned__cSpecified = true;
             l1.IsBanned__c = isBanned;
 
-            l1.Company = "none";
+            l1.Company = messageType;
 
             l1.birthdate__cSpecified = true;
             l1.birthdate__c = gebDatum;
 
-            l1.CompanyDunsNumber = btwNr;
+            l1.btw__c = btwNr;
             l1.Phone = gsm;
 
             l1.gdpr__cSpecified = true;
@@ -920,8 +920,8 @@ namespace Integration_Project_CRM
                         XmlNodeList banned = doc.GetElementsByTagName("banned");
                         ///Not Required:
                         XmlNodeList geboortedatum = doc.GetElementsByTagName("geboortedatum");
-                        XmlNodeList gsm = doc.GetElementsByTagName("gsm-nummer");
-                        XmlNodeList btw = doc.GetElementsByTagName("btw-nummer");
+                        XmlNodeList gsm = doc.GetElementsByTagName("gsm");
+                        XmlNodeList btw = doc.GetElementsByTagName("btw");
                         XmlNodeList extra = doc.GetElementsByTagName("extraField");
 
 
@@ -939,10 +939,31 @@ namespace Integration_Project_CRM
 
                             ////LEAD
                             ///
-                            case "leaddd":
+                            case "Visitorrr":
+
+                                string idRec = GetLeadID(_sForceRef, uuid[0].InnerText);
+
+                                if (idRec == "empty")
+                                {
+                                    Console.WriteLine("new data ...");
+                                    CreateLead(_sForceRef, messageType, uuid[0].InnerText, fname[0].InnerText, lname[0].InnerText, email[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), Convert.ToBoolean(isactive[0].InnerText), Convert.ToBoolean(banned[0].InnerText), gsm[0].InnerText, Convert.ToDateTime(geboortedatum[0].InnerText), btw[0].InnerText, Convert.ToBoolean(gdpr[0].InnerText));
+                                    break;
+                                }
+                                else
+                                {
+                                    if (Convert.ToInt32(version[0].InnerText) > GetLead(_sForceRef, uuid[0].InnerText).Version__c)
+                                    {
+                                        updateRecordLead(_sForceRef, messageType,idRec, uuid[0].InnerText, fname[0].InnerText, lname[0].InnerText, email[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), Convert.ToBoolean(isactive[0].InnerText), Convert.ToBoolean(banned[0].InnerText), gsm[0].InnerText, Convert.ToDateTime(geboortedatum[0].InnerText), btw[0].InnerText, Convert.ToBoolean(gdpr[0].InnerText));
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("version lower..");
+                                    }
+
+                                }
+
 
                                 // CreateLead(_sForceRef, "AazCCC", "Bonion", "Azeei", "zaee@shelby.com", DateTime.Now, 1, false, true, "23474352", new DateTime(1997, 08, 14), "235775", true);
-                                CreateLead(_sForceRef,messageType, uuid[0].InnerText, fname[0].InnerText, lname[0].InnerText, email[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), Convert.ToBoolean(isactive[0].InnerText), Convert.ToBoolean(banned[0].InnerText), gsm[0].InnerText, Convert.ToDateTime(geboortedatum[0].InnerText), btw[0].InnerText, Convert.ToBoolean(gdpr[0].InnerText));
 
 
                                 //OK--> CreateLead(_sForceRef, messageType, uuid[0].InnerText, fname[0].InnerText, lname[0].InnerText, email[0].InnerText, 234234, 2, true, true, gsm[0].InnerText, new DateTime(2000, 12, 12), btw[0].InnerText, true);
@@ -954,13 +975,33 @@ namespace Integration_Project_CRM
                             case "delete":
 
 
-                                string id = GetLeadID(_sForceRef, "Bonion Azeei", "zaee@shelby.com");
-                                Delete(_sForceRef, id);
+                                string id = GetLeadID(_sForceRef, uuid[0].InnerText);
+
+
+                                if(id != "empty")
+                                {
+                                    if((GetLead(_sForceRef, uuid[0].InnerText).IsActive__c != true)&& (GetLead(_sForceRef, uuid[0].InnerText).gdpr__c != true))
+                                    {
+                                        Delete(_sForceRef, id);
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Unable to delete (Still Active lead / gdpr = false");
+                                        break;
+                                    }
+
+                                }
+                                Console.WriteLine("Lead not found");
                                 break;
 
-                            case "ConvertLead_Contact":
 
-                                Lead lead = GetLead(_sForceRef, "Onion Azoi", "zaaa@shelby.com");
+
+
+
+                            case "ConvertLead_Contact":
+                                
+                                Lead lead = GetLead(_sForceRef,"XXX");
                                 convertLeadToContact(_sForceRef, lead);
 
 
@@ -968,8 +1009,11 @@ namespace Integration_Project_CRM
 
                             case "update":
 
-                                string idTeUpdatenRec = GetLeadID(_sForceRef, "John Wick", "wiki@gmail.com");
-                                updateRecordLead(_sForceRef, idTeUpdatenRec, "DE3ACAAA", "John", "Weak", "jonny@wiki.com", 566465465, 3, false, false, "0000003", new DateTime(1960, 01, 04), "000005934", false);
+                                //string idTeUpdatenRec = GetLeadID(_sForceRef, "John Wick", "wiki@gmail.com");
+                                //updateRecordLead(_sForceRef, idTeUpdatenRec, "DE3ACAAA", "John", "Weak", "jonny@wiki.com", 566465465, 3, false, false, "0000003", new DateTime(1960, 01, 04), "000005934", false);
+
+                                string idTeUpdatenRec = GetLeadID(_sForceRef, uuid[0].InnerText );
+                                updateRecordLead(_sForceRef, messageType ,idTeUpdatenRec, uuid[0].InnerText, fname[0].InnerText, lname[0].InnerText, email[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), Convert.ToBoolean(isactive[0].InnerText), Convert.ToBoolean(banned[0].InnerText), gsm[0].InnerText, Convert.ToDateTime(geboortedatum[0].InnerText), btw[0].InnerText, Convert.ToBoolean(gdpr[0].InnerText));
 
                                 break;
 

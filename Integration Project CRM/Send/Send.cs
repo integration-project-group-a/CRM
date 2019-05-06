@@ -22,7 +22,7 @@ namespace Send
                 channel.ExchangeDeclare(exchange: "logs", type: "fanout");
                 String xmlStr;
                 byte[] body;
-                xmlStr = "<message><header><messageType>leaddd</messageType><description>Creation of a visitor</description><sender>front-end</sender><!-- front-end, crm, facturatie, kassa, control-room, planning --></header><datastructure><UUID>APOPOPO</UUID><name><firstname>Aloopa</firstname><lastname>polaaa</lastname></name><email>blA@saAt.be</email><GDPR>true</GDPR><timestamp>1522223440</timestamp><version>1</version><isActive>false</isActive><banned>true</banned><!-- Not required fields --><geboortedatum>1997-08-12</geboortedatum><btw-nummer>62433654</btw-nummer><gsm-nummer>01164165468</gsm-nummer><extraField></extraField></datastructure></message>";
+                xmlStr = "<message><header><messageType>Visitorrr</messageType><description>Creation of a visitor</description><sender>front-end</sender><!-- crm --></header><datastructure><UUID>Flavi34</UUID><name><firstname>Mosatooo</firstname><lastname>Posatoooo</lastname></name><email>blAPosat@saAt.be</email><GDPR>false</GDPR><timestamp>1522113440</timestamp><version>3</version><isActive>false</isActive><banned>false</banned><!-- Not required fields --><geboortedatum>1997-08-12</geboortedatum><btw>BE15656464654</btw><gsm>01164165468</gsm><extraField></extraField></datastructure></message>";
 
                 body = Encoding.UTF8.GetBytes(xmlStr);
                 channel.BasicPublish(exchange: "logs", routingKey: "", basicProperties: null, body: body);
