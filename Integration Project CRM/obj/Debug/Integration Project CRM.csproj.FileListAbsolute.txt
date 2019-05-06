@@ -1,0 +1,12 @@
+C:\Users\MediaMonster\source\repos\Integration Project CRM\Integration Project CRM\bin\Debug\Integration Project CRM.exe.config
+C:\Users\MediaMonster\source\repos\Integration Project CRM\Integration Project CRM\bin\Debug\Integration Project CRM.exe
+C:\Users\MediaMonster\source\repos\Integration Project CRM\Integration Project CRM\bin\Debug\Integration Project CRM.pdb
+C:\Users\MediaMonster\source\repos\Integration Project CRM\Integration Project CRM\obj\Debug\Integration Project CRM.csprojAssemblyReference.cache
+C:\Users\MediaMonster\source\repos\Integration Project CRM\Integration Project CRM\obj\Debug\Integration Project CRM.csproj.CoreCompileInputs.cache
+C:\Users\MediaMonster\source\repos\Integration Project CRM\Integration Project CRM\obj\Debug\Integration Project CRM.exe
+C:\Users\MediaMonster\source\repos\Integration Project CRM\Integration Project CRM\obj\Debug\Integration Project CRM.pdb
+C:\Users\MediaMonster\source\repos\Integration Project CRM\Integration Project CRM\bin\Debug\Microsoft.Diagnostics.Tracing.EventSource.dll
+C:\Users\MediaMonster\source\repos\Integration Project CRM\Integration Project CRM\bin\Debug\RabbitMQ.Client.dll
+C:\Users\MediaMonster\source\repos\Integration Project CRM\Integration Project CRM\bin\Debug\Microsoft.Diagnostics.Tracing.EventSource.xml
+C:\Users\MediaMonster\source\repos\Integration Project CRM\Integration Project CRM\bin\Debug\RabbitMQ.Client.xml
+C:\Users\MediaMonster\source\repos\Integration Project CRM\Integration Project CRM\obj\Debug\Integration Project CRM.csproj.CopyComplete
