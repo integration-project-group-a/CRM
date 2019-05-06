@@ -920,8 +920,8 @@ namespace Integration_Project_CRM
                         XmlNodeList banned = doc.GetElementsByTagName("banned");
                         ///Not Required:
                         XmlNodeList geboortedatum = doc.GetElementsByTagName("geboortedatum");
-                        XmlNodeList gsm = doc.GetElementsByTagName("gsm-nummer");
-                        XmlNodeList btw = doc.GetElementsByTagName("btw-nummer");
+                        XmlNodeList gsm = doc.GetElementsByTagName("gsm");
+                        XmlNodeList btw = doc.GetElementsByTagName("btw");
                         XmlNodeList extra = doc.GetElementsByTagName("extraField");
 
 
@@ -939,7 +939,7 @@ namespace Integration_Project_CRM
 
                             ////LEAD
                             ///
-                            case "leaddd":
+                            case "Visitor":
 
                                 // CreateLead(_sForceRef, "AazCCC", "Bonion", "Azeei", "zaee@shelby.com", DateTime.Now, 1, false, true, "23474352", new DateTime(1997, 08, 14), "235775", true);
                                 CreateLead(_sForceRef,messageType, uuid[0].InnerText, fname[0].InnerText, lname[0].InnerText, email[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), Convert.ToBoolean(isactive[0].InnerText), Convert.ToBoolean(banned[0].InnerText), gsm[0].InnerText, Convert.ToDateTime(geboortedatum[0].InnerText), btw[0].InnerText, Convert.ToBoolean(gdpr[0].InnerText));
@@ -968,8 +968,11 @@ namespace Integration_Project_CRM
 
                             case "update":
 
-                                string idTeUpdatenRec = GetLeadID(_sForceRef, "John Wick", "wiki@gmail.com");
-                                updateRecordLead(_sForceRef, idTeUpdatenRec, "DE3ACAAA", "John", "Weak", "jonny@wiki.com", 566465465, 3, false, false, "0000003", new DateTime(1960, 01, 04), "000005934", false);
+                                //string idTeUpdatenRec = GetLeadID(_sForceRef, "John Wick", "wiki@gmail.com");
+                                //updateRecordLead(_sForceRef, idTeUpdatenRec, "DE3ACAAA", "John", "Weak", "jonny@wiki.com", 566465465, 3, false, false, "0000003", new DateTime(1960, 01, 04), "000005934", false);
+
+                                string idTeUpdatenRec = GetLeadID(_sForceRef, fname[0].InnerText + " " + lname[0].InnerText, email[0].InnerText);
+                                updateRecordLead(_sForceRef, idTeUpdatenRec, uuid[0].InnerText, fname[0].InnerText, lname[0].InnerText, email[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), Convert.ToBoolean(isactive[0].InnerText), Convert.ToBoolean(banned[0].InnerText), gsm[0].InnerText, Convert.ToDateTime(geboortedatum[0].InnerText), btw[0].InnerText, Convert.ToBoolean(gdpr[0].InnerText));
 
                                 break;
 
