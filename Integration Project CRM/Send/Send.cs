@@ -22,7 +22,7 @@ namespace Send
                 channel.ExchangeDeclare(exchange: "logs", type: "fanout");
                 String xmlStr;
                 byte[] body;
-                xmlStr = "<message><header><messageType>Visitor</messageType><description>Creation of a visitor</description><sender>front-end</sender><!-- front-end, crm, facturatie, kassa, control-room, planning --></header><datastructure><UUID>x2de0z0d</UUID><name><firstname>Anthe</firstname><lastname>Boets</lastname></name><email>anthe.boets@student.ehb.be</email><GDPR>true</GDPR><timestamp>1555934040</timestamp><version>1</version><isActive>true</isActive><banned>false</banned><!-- Not required fields --><geboortedatum>1999-04-30</geboortedatum><btw-nummer>BE15656464654</btw-nummer><gsm-nummer>015313164165468</gsm-nummer><extraField></extraField></datastructure></message>";
+                xmlStr = "<message><header><messageType>leaddd</messageType><description>Creation of a visitor</description><sender>front-end</sender><!-- front-end, crm, facturatie, kassa, control-room, planning --></header><datastructure><UUID>APOPOPO</UUID><name><firstname>Aloopa</firstname><lastname>polaaa</lastname></name><email>blA@saAt.be</email><GDPR>true</GDPR><timestamp>1522223440</timestamp><version>1</version><isActive>false</isActive><banned>true</banned><!-- Not required fields --><geboortedatum>1997-08-12</geboortedatum><btw-nummer>62433654</btw-nummer><gsm-nummer>01164165468</gsm-nummer><extraField></extraField></datastructure></message>";
 
                 body = Encoding.UTF8.GetBytes(xmlStr);
                 channel.BasicPublish(exchange: "logs", routingKey: "", basicProperties: null, body: body);
@@ -55,3 +55,4 @@ namespace Send
 
     }
 }
+
