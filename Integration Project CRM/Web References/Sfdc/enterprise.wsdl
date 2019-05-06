@@ -6512,7 +6512,7 @@
               <xsd:element minOccurs="0" name="Website" nillable="true" type="xsd:string" />
               <xsd:element minOccurs="0" name="birthdate__c" nillable="true" type="xsd:date" />
               <xsd:element minOccurs="0" name="gdpr__c" nillable="true" type="xsd:boolean" />
-              <xsd:element minOccurs="0" name="timestamp__c" nillable="true" type="xsd:dateTime" />
+              <xsd:element minOccurs="0" name="timestamp__c" nillable="true" type="xsd:double" />
             </xsd:sequence>
           </xsd:extension>
         </xsd:complexContent>

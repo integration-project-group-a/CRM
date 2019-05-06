@@ -4,18 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net;
-using Integration_Project_CRM.Sfdc;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Web.Services.Protocols;
 using System.Xml;
+using Integration_Project_CRM.Sfdc;
 
 namespace Integration_Project_CRM
 {
     class Program
     {
 
-        private static void CreateLead(SforceService _sForceRef, string uuid, string firstName, string lastName, string email, DateTime timestampLead, double versionLead, bool isActive, bool isBanned, string gsm, DateTime gebDatum, string btwNr, bool gdpr)
+        private static void CreateLead(SforceService _sForceRef, string messageType, string uuid, string firstName, string lastName, string email, Int32 timestampLead, Int32 versionLead, bool isActive, bool isBanned, string gsm, DateTime gebDatum, string btwNr, bool gdpr)
         {
 
 
@@ -41,7 +41,7 @@ namespace Integration_Project_CRM
             l1.IsBanned__cSpecified = true;
             l1.IsBanned__c = isBanned;
 
-            l1.Company = "none";
+            l1.Company = messageType;
 
             l1.birthdate__cSpecified = true;
             l1.birthdate__c = gebDatum;
@@ -133,7 +133,7 @@ namespace Integration_Project_CRM
 
 
 
-        private static string GetLeadID(SforceService _sForceRef,string searchingLeadName, string searchingLeadEmail)
+        private static string GetLeadID(SforceService _sForceRef, string searchingLeadName, string searchingLeadEmail)
         {
             QueryResult qResult = null;
             try
@@ -193,7 +193,7 @@ namespace Integration_Project_CRM
             }
 
         }
-        private static string GetAccountID(SforceService _sForceRef,string searchingAccountName, string searchingAccountPhone)
+        private static string GetAccountID(SforceService _sForceRef, string searchingAccountName, string searchingAccountPhone)
         {
             QueryResult qResult = null;
             try
@@ -254,7 +254,7 @@ namespace Integration_Project_CRM
 
         }
         //accounts deleten waarvan contacten of opportunities nog aan gekoppeld zijn gaat niet!
-        private static string GetContactID(SforceService _sForceRef,string searchingContactName, string searchingContactEmail)
+        private static string GetContactID(SforceService _sForceRef, string searchingContactName, string searchingContactEmail)
         {
             QueryResult qResult = null;
             try
@@ -317,7 +317,7 @@ namespace Integration_Project_CRM
 
 
 
-        private static void Delete(SforceService _sForceRef,string id)
+        private static void Delete(SforceService _sForceRef, string id)
         {
             string[] ids = new string[1];
             ids[0] = id;
@@ -364,7 +364,7 @@ namespace Integration_Project_CRM
         }
 
 
-        private static Lead GetLead(SforceService _sForceRef,string searchingLeadName, string searchingLeadEmail)
+        private static Lead GetLead(SforceService _sForceRef, string searchingLeadName, string searchingLeadEmail)
         {
 
             QueryResult qResult = null;
@@ -427,7 +427,7 @@ namespace Integration_Project_CRM
 
 
         }
-        private static Contact GetContact(SforceService _sForceRef,string searchingContactName, string searchingContactEmail)
+        private static Contact GetContact(SforceService _sForceRef, string searchingContactName, string searchingContactEmail)
         {
 
             QueryResult qResult = null;
@@ -490,7 +490,7 @@ namespace Integration_Project_CRM
 
 
         }
-        private static Account GetAccount(SforceService _sForceRef,string searchingAccountName, string searchingAccountPhone)
+        private static Account GetAccount(SforceService _sForceRef, string searchingAccountName, string searchingAccountPhone)
         {
 
             QueryResult qResult = null;
@@ -557,7 +557,7 @@ namespace Integration_Project_CRM
 
 
         //____ CONVERTLEAD __ WERKEND ___?? Lead->Contact (gaat eveneens een account en een opportunity aanmaken( dmv company))_//
-        private static string[] convertLeadToContact(SforceService _sForceRef,Lead leadToConvert)
+        private static string[] convertLeadToContact(SforceService _sForceRef, Lead leadToConvert)
         {
 
 
@@ -617,7 +617,7 @@ namespace Integration_Project_CRM
         }
 
 
-        private static void updateRecordLead(SforceService _sForceRef,String idLead, string uuid, string firstName, string lastName, string email, DateTime timestampLead, double versionLead, bool isActive, bool isBanned, string gsm, DateTime gebDatum, string btwNr, bool gdpr)
+        private static void updateRecordLead(SforceService _sForceRef, String idLead, string uuid, string firstName, string lastName, string email, Int32 timestampLead, double versionLead, bool isActive, bool isBanned, string gsm, DateTime gebDatum, string btwNr, bool gdpr)
         {
             Lead[] updates = new Lead[1];
 
@@ -743,7 +743,7 @@ namespace Integration_Project_CRM
             }
 
         }
-        private static void updateRecordContact(SforceService _sForceRef,String idContact)
+        private static void updateRecordContact(SforceService _sForceRef, String idContact)
         {
             Contact[] updates = new Contact[1];
 
@@ -907,48 +907,69 @@ namespace Integration_Project_CRM
                         XmlNodeList xmlList = doc.GetElementsByTagName("messageType");
                         //string messageType = xmlList[0].InnerText.ToLower();
                         string messageType = xmlList[0].InnerText;
+
+                        XmlNodeList uuid = doc.GetElementsByTagName("UUID");
+                        XmlNodeList fname = doc.GetElementsByTagName("firstname");
+                        XmlNodeList lname = doc.GetElementsByTagName("lastname");
+                        XmlNodeList email = doc.GetElementsByTagName("email");
+                        XmlNodeList sender = doc.GetElementsByTagName("sender");
+                        XmlNodeList gdpr = doc.GetElementsByTagName("GDPR");
+                        XmlNodeList timestamp = doc.GetElementsByTagName("timestamp");
+                        XmlNodeList version = doc.GetElementsByTagName("version");
+                        XmlNodeList isactive = doc.GetElementsByTagName("isActive");
+                        XmlNodeList banned = doc.GetElementsByTagName("banned");
+                        ///Not Required:
+                        XmlNodeList geboortedatum = doc.GetElementsByTagName("geboortedatum");
+                        XmlNodeList gsm = doc.GetElementsByTagName("gsm-nummer");
+                        XmlNodeList btw = doc.GetElementsByTagName("btw-nummer");
+                        XmlNodeList extra = doc.GetElementsByTagName("extraField");
+
+
                         switch (messageType)
                         {
-                            case "lead_Visitor":
+                            //CONTACT  
+
+                            case "conatact":
 
 
-
-
-
-
-                                CreateLead(_sForceRef, "AazCCC", "Bonion", "Azeei", "zaee@shelby.com", DateTime.Now, 1, false, true, "23474352", new DateTime(1997, 08, 14), "235775", true);
-                                break;
-
-
-
-
-                            case "Visitor":
-                                XmlNodeList fname = doc.GetElementsByTagName("firstname");
-                                XmlNodeList lname = doc.GetElementsByTagName("lastname");
-                                XmlNodeList email = doc.GetElementsByTagName("email");
-                                XmlNodeList gsm = doc.GetElementsByTagName("gsm-nummer");
-
-                                CreateContact(_sForceRef, "ANTEST", "BOTEST", email[0].InnerText, gsm[0].InnerText);
+                                CreateContact(_sForceRef, "Sami", "Pete", email[0].InnerText, gsm[0].InnerText);
+                                //CreateContact(_sForceRef, fname[0].InnerText, lname[0].InnerText, email[0].InnerText, gsm[0].InnerText);
 
                                 break;
-                            
+
+                            ////LEAD
+                            ///
+                            case "leaddd":
+
+                                // CreateLead(_sForceRef, "AazCCC", "Bonion", "Azeei", "zaee@shelby.com", DateTime.Now, 1, false, true, "23474352", new DateTime(1997, 08, 14), "235775", true);
+                                CreateLead(_sForceRef,messageType, uuid[0].InnerText, fname[0].InnerText, lname[0].InnerText, email[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), Convert.ToBoolean(isactive[0].InnerText), Convert.ToBoolean(banned[0].InnerText), gsm[0].InnerText, Convert.ToDateTime(geboortedatum[0].InnerText), btw[0].InnerText, Convert.ToBoolean(gdpr[0].InnerText));
+
+
+                                //OK--> CreateLead(_sForceRef, messageType, uuid[0].InnerText, fname[0].InnerText, lname[0].InnerText, email[0].InnerText, 234234, 2, true, true, gsm[0].InnerText, new DateTime(2000, 12, 12), btw[0].InnerText, true);
+                                //CreateLead(_sForceRef, messageType, uuid[0].InnerText, fname[0].InnerText, lname[0].InnerText, email[0].InnerText, 234234, 2, Convert.ToBoolean(isactive[0].InnerText), Convert.ToBoolean(banned[0].InnerText), gsm[0].InnerText, new DateTime(2000, 12, 12), btw[0].InnerText, Convert.ToBoolean(gdpr[0].InnerText));
+
+
+                                break;
+
                             case "delete":
+
+
                                 string id = GetLeadID(_sForceRef, "Bonion Azeei", "zaee@shelby.com");
-                                 Delete(_sForceRef,id);
-                                 break;
-                                
+                                Delete(_sForceRef, id);
+                                break;
+
                             case "ConvertLead_Contact":
 
                                 Lead lead = GetLead(_sForceRef, "Onion Azoi", "zaaa@shelby.com");
                                 convertLeadToContact(_sForceRef, lead);
 
-                                
+
                                 break;
 
                             case "update":
 
                                 string idTeUpdatenRec = GetLeadID(_sForceRef, "John Wick", "wiki@gmail.com");
-                                updateRecordLead(_sForceRef, idTeUpdatenRec, "DE3ACAAA", "John", "Weak", "jonny@wiki.com", DateTime.Now, 3, false, false, "0000003", new DateTime(1960, 01, 04), "000005934", false);
+                                updateRecordLead(_sForceRef, idTeUpdatenRec, "DE3ACAAA", "John", "Weak", "jonny@wiki.com", 566465465, 3, false, false, "0000003", new DateTime(1960, 01, 04), "000005934", false);
 
                                 break;
 
