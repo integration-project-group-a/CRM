@@ -4873,6 +4873,49 @@
           </xsd:extension>
         </xsd:complexContent>
       </xsd:complexType>
+      <xsd:complexType name="EEvent__c">
+        <xsd:complexContent mixed="false">
+          <xsd:extension base="ens:sObject">
+            <xsd:sequence>
+              <xsd:element minOccurs="0" name="AttachedContentDocuments" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="Attachments" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="CombinedAttachments" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="ContactRequests" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="ContentDocumentLinks" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="CreatedBy" nillable="true" type="ens:User" />
+              <xsd:element minOccurs="0" name="CreatedById" nillable="true" type="tns:ID" />
+              <xsd:element minOccurs="0" name="CreatedDate" nillable="true" type="xsd:dateTime" />
+              <xsd:element minOccurs="0" name="DuplicateRecordItems" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="Emails" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="FeedSubscriptionsForEntity" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="IsActive__c" nillable="true" type="xsd:boolean" />
+              <xsd:element minOccurs="0" name="IsDeleted" nillable="true" type="xsd:boolean" />
+              <xsd:element minOccurs="0" name="LastModifiedBy" nillable="true" type="ens:User" />
+              <xsd:element minOccurs="0" name="LastModifiedById" nillable="true" type="tns:ID" />
+              <xsd:element minOccurs="0" name="LastModifiedDate" nillable="true" type="xsd:dateTime" />
+              <xsd:element minOccurs="0" name="LastReferencedDate" nillable="true" type="xsd:dateTime" />
+              <xsd:element minOccurs="0" name="LastViewedDate" nillable="true" type="xsd:dateTime" />
+              <xsd:element minOccurs="0" name="LookedUpFromActivities" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="Name" nillable="true" type="xsd:string" />
+              <xsd:element minOccurs="0" name="Notes" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="NotesAndAttachments" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="Owner" nillable="true" type="ens:sObject" />
+              <xsd:element minOccurs="0" name="OwnerId" nillable="true" type="tns:ID" />
+              <xsd:element minOccurs="0" name="ProcessInstances" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="ProcessSteps" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="RecordActionHistories" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="RecordActions" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="RecordAssociatedGroups" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="SystemModstamp" nillable="true" type="xsd:dateTime" />
+              <xsd:element minOccurs="0" name="TopicAssignments" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="UUID__c" nillable="true" type="xsd:string" />
+              <xsd:element minOccurs="0" name="UserRecordAccess" nillable="true" type="ens:UserRecordAccess" />
+              <xsd:element minOccurs="0" name="Version__c" nillable="true" type="xsd:double" />
+              <xsd:element minOccurs="0" name="timestamp__c" nillable="true" type="xsd:double" />
+            </xsd:sequence>
+          </xsd:extension>
+        </xsd:complexContent>
+      </xsd:complexType>
       <xsd:complexType name="EmailCapture">
         <xsd:complexContent mixed="false">
           <xsd:extension base="ens:sObject">
@@ -10052,6 +10095,51 @@
               <xsd:element minOccurs="0" name="SystemModstamp" nillable="true" type="xsd:dateTime" />
               <xsd:element minOccurs="0" name="Title" nillable="true" type="xsd:string" />
               <xsd:element minOccurs="0" name="Type" nillable="true" type="xsd:string" />
+            </xsd:sequence>
+          </xsd:extension>
+        </xsd:complexContent>
+      </xsd:complexType>
+      <xsd:complexType name="SSession__c">
+        <xsd:complexContent mixed="false">
+          <xsd:extension base="ens:sObject">
+            <xsd:sequence>
+              <xsd:element minOccurs="0" name="AttachedContentDocuments" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="Attachments" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="CombinedAttachments" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="ContactRequests" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="ContentDocumentLinks" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="CreatedBy" nillable="true" type="ens:User" />
+              <xsd:element minOccurs="0" name="CreatedById" nillable="true" type="tns:ID" />
+              <xsd:element minOccurs="0" name="CreatedDate" nillable="true" type="xsd:dateTime" />
+              <xsd:element minOccurs="0" name="Description__c" nillable="true" type="xsd:string" />
+              <xsd:element minOccurs="0" name="DuplicateRecordItems" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="Emails" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="EndDTime__c" nillable="true" type="xsd:dateTime" />
+              <xsd:element minOccurs="0" name="FeedSubscriptionsForEntity" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="IsDeleted" nillable="true" type="xsd:boolean" />
+              <xsd:element minOccurs="0" name="LastModifiedBy" nillable="true" type="ens:User" />
+              <xsd:element minOccurs="0" name="LastModifiedById" nillable="true" type="tns:ID" />
+              <xsd:element minOccurs="0" name="LastModifiedDate" nillable="true" type="xsd:dateTime" />
+              <xsd:element minOccurs="0" name="LastReferencedDate" nillable="true" type="xsd:dateTime" />
+              <xsd:element minOccurs="0" name="LastViewedDate" nillable="true" type="xsd:dateTime" />
+              <xsd:element minOccurs="0" name="Lokaal__c" nillable="true" type="xsd:string" />
+              <xsd:element minOccurs="0" name="LookedUpFromActivities" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="Name" nillable="true" type="xsd:string" />
+              <xsd:element minOccurs="0" name="Notes" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="NotesAndAttachments" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="Owner" nillable="true" type="ens:sObject" />
+              <xsd:element minOccurs="0" name="OwnerId" nillable="true" type="tns:ID" />
+              <xsd:element minOccurs="0" name="ProcessInstances" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="ProcessSteps" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="RecordActionHistories" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="RecordActions" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="RecordAssociatedGroups" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="StartDTime__c" nillable="true" type="xsd:dateTime" />
+              <xsd:element minOccurs="0" name="SystemModstamp" nillable="true" type="xsd:dateTime" />
+              <xsd:element minOccurs="0" name="TopicAssignments" nillable="true" type="tns:QueryResult" />
+              <xsd:element minOccurs="0" name="UUID_Event__c" nillable="true" type="xsd:string" />
+              <xsd:element minOccurs="0" name="UUID_Session__c" nillable="true" type="xsd:string" />
+              <xsd:element minOccurs="0" name="UserRecordAccess" nillable="true" type="ens:UserRecordAccess" />
             </xsd:sequence>
           </xsd:extension>
         </xsd:complexContent>
