@@ -59,14 +59,13 @@ namespace Integration_Project_CRM
             {
                 string id = createResult[0].id;
 
-                Console.WriteLine("Id:" + id);
-                Console.WriteLine("Lead + " + id + " succesfully added ");
+                Console.WriteLine("Lead " + firstName+" "+ lastName + " succesfully added "+ Environment.NewLine+"UUID of the created Lead: "+ uuid);
 
             }
             else
             {
                 string resultaat = createResult[0].errors[0].message;
-                Console.WriteLine("Error, Lead not added" + resultaat);
+                Console.WriteLine("Error, Lead not added."+ Environment.NewLine +"ERROR> "+ resultaat);
             }
 
 
@@ -131,7 +130,81 @@ namespace Integration_Project_CRM
 
 
         }
+        private static void CreateEvent(SforceService _sForceRef, string nameEvent, string uuid, Int32 timestamp, Int32 version, bool isActive)
+        {
 
+
+
+            EEvent__c event1 = new EEvent__c();
+
+            event1.UUID__c = uuid;
+            event1.Name = nameEvent;
+
+            event1.IsActive__cSpecified = true;
+            event1.timestamp__cSpecified = true;
+            event1.Version__cSpecified = true;
+            event1.timestamp__c = timestamp;
+            event1.Version__c = version;
+            event1.IsActive__c = isActive;
+
+
+
+            SaveResult[] createResult = _sForceRef.create(new sObject[] { event1 });
+
+            if (createResult[0].success)
+            {
+                string id = createResult[0].id;
+
+                Console.WriteLine("Event:" + nameEvent + " succesfully added ");
+
+            }
+            else
+            {
+                string resultaat = createResult[0].errors[0].message;
+                Console.WriteLine("Error, event "+ nameEvent + " not added. "+ Environment.NewLine +"ERROR> "+ resultaat);
+            }
+
+
+        }
+        private static void CreateSession(SforceService _sForceRef, string nameSession, string uuidEvent, string uuidSession ,string description,string lokaal, DateTime start,DateTime end)
+        {
+
+
+
+            SSession__c session1 = new SSession__c();
+
+            session1.UUID_Event__c = uuidEvent;
+
+            session1.UUID_Session__c = uuidSession;
+
+            session1.Name = nameSession;
+            session1.Description__c = description;
+            session1.Lokaal__c = lokaal;
+
+            session1.StartDTime__cSpecified = true;
+            session1.EndDTime__cSpecified = true;
+
+            session1.StartDTime__c = start;
+            session1.EndDTime__c = end;
+
+
+            SaveResult[] createResult = _sForceRef.create(new sObject[] { session1 });
+
+            if (createResult[0].success)
+            {
+                string id = createResult[0].id;
+
+                Console.WriteLine("Session:" + nameSession + " succesfully added ");
+
+            }
+            else
+            {
+                string resultaat = createResult[0].errors[0].message;
+                Console.WriteLine("Error, event " + nameSession + " not added. " + Environment.NewLine + "ERROR> " + resultaat);
+            }
+
+
+        }
 
 
         private static string GetLeadID(SforceService _sForceRef,string uuid)
@@ -144,22 +217,22 @@ namespace Integration_Project_CRM
                 Boolean done = false;
                 if (qResult.size > 0)
                 {
-                    Console.WriteLine("Record found...");
+                    Console.WriteLine("Lead with UUID: "+uuid+" has been found!");
                     while (!done)
                     {
                         sObject[] records = qResult.records;
-                        for (int i = 0; i < records.Length; ++i)
+                        for (int i = 0; i < records.Length; i++)
                         {
                             Lead l1 = (Lead)records[i];
                             String id = l1.Id;
                             if (id != null)
                             {
-                                Console.WriteLine("Lead " + uuid +" --> id: " + id);
+                                Console.WriteLine("Lead with following UUID" + uuid + " has the following SalesForce-ID: " + id);
                                 return id;
                             }
                             else
                             {
-                                Console.WriteLine("Lead " + uuid + " --> " + "ERROR");
+                                Console.WriteLine("Lead with following UUID" + uuid + " has no SalesForce-ID ..."+ Environment.NewLine+ "ERROR");
                                 return "empty";
                             }
 
@@ -176,11 +249,11 @@ namespace Integration_Project_CRM
                 }
                 else
                 {
-                    Console.WriteLine("No records found.");
+                    Console.WriteLine("No Lead found.");
                     return "empty";
 
                 }
-                Console.WriteLine("\nQuery succesfully executed.");
+                Console.WriteLine("Query succesfully executed."+Environment.NewLine+"No Lead with UUID: "+uuid+" founded in SalesForce...");
                 return "empty";
 
             }
@@ -193,6 +266,69 @@ namespace Integration_Project_CRM
             }
 
         }
+        private static string GetEventID(SforceService _sForceRef, string uuid)
+        {
+            QueryResult qResult = null;
+            try
+            {
+                String soqlQuery = "SELECT Id FROM EEvent__c WHERE UUID__c='" + uuid + "'";
+                qResult = _sForceRef.query(soqlQuery);
+                Boolean done = false;
+                if (qResult.size > 0)
+                {
+                    Console.WriteLine("Event with UUID: " + uuid + " has been found!");
+                    while (!done)
+                    {
+                        sObject[] records = qResult.records;
+                        for (int i = 0; i < records.Length; i++)
+                        {
+                            EEvent__c e1 = (EEvent__c)records[i];
+                            String id = e1.Id;
+                            if (id != null)
+                            {
+                                Console.WriteLine("Event with following UUID" + uuid + " has the following SalesForce-ID: " + id);
+                                return id;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Event with following UUID" + uuid + " has no SalesForce-ID ..." + Environment.NewLine + "ERROR");
+                                return "empty";
+                            }
+
+                        }
+                        if (qResult.done)
+                        {
+                            done = true;
+                        }
+                        else
+                        {
+                            qResult = _sForceRef.queryMore(qResult.queryLocator);
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No Event found.");
+                    return "empty";
+
+                }
+                Console.WriteLine("Query succesfully executed." + Environment.NewLine + "No Event with UUID: " + uuid + " founded in SalesForce...");
+                return "empty";
+
+            }
+            catch (SoapException e)
+            {
+                Console.WriteLine("An unexpected error has occurred: " +
+                                           e.Message + "\n" + e.StackTrace);
+                return "empty";
+
+            }
+
+        }
+
+
+
+
         private static string GetAccountID(SforceService _sForceRef, string searchingAccountName, string searchingAccountPhone)
         {
             QueryResult qResult = null;
@@ -427,6 +563,71 @@ namespace Integration_Project_CRM
 
 
         }
+        private static EEvent__c GetEvent(SforceService _sForceRef, string uuid)
+        {
+
+            QueryResult qResult = null;
+            try
+            {
+                String soqlQuery = "SELECT  UUID__c, Name, Timestamp__c, Version__c, IsActive__c FROM EEvent__c WHERE UUID__c ='" + uuid + "'";
+                qResult = _sForceRef.query(soqlQuery);
+                Boolean done = false;
+                if (qResult.size > 0)
+                {
+                    Console.WriteLine("Logged-in user can see a total of "
+                       + qResult.size + " event records.");
+                    while (!done)
+                    {
+                        sObject[] records = qResult.records;
+                        for (int i = 0; i < records.Length; i++)
+                        {
+                            EEvent__c e1 = (EEvent__c)records[i];
+
+                            if (e1 != null)
+                            {
+                                Console.WriteLine("Event " + uuid + " found");
+                                return e1;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Event " + uuid + " " + (i + 1) + ": " + "ERROR");
+                                return null;
+                            }
+
+                        }
+                        if (qResult.done)
+                        {
+                            done = true;
+                        }
+                        else
+                        {
+                            qResult = _sForceRef.queryMore(qResult.queryLocator);
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No records found.");
+                    return null;
+
+                }
+                Console.WriteLine("\nQuery succesfully executed.");
+                return null;
+
+            }
+            catch (SoapException e)
+            {
+                Console.WriteLine("An unexpected error has occurred: " +
+                                           e.Message + "\n" + e.StackTrace);
+                return null;
+
+            }
+
+
+
+        }
+
+
         private static Contact GetContact(SforceService _sForceRef, string searchingContactName, string searchingContactEmail)
         {
 
@@ -553,6 +754,7 @@ namespace Integration_Project_CRM
 
 
         }
+
 
 
 
@@ -692,6 +894,65 @@ namespace Integration_Project_CRM
             }
 
         }
+        private static void updateRecordEvent(SforceService _sForceRef, string messageType, string idEvent ,string nameEvent, string uuid, Int32 timestamp, Int32 version, bool isActive)
+        {
+            EEvent__c[] updates = new EEvent__c[1];
+
+
+
+
+            EEvent__c event1 = new EEvent__c();
+            event1.Id = idEvent;
+
+
+            event1.UUID__c = uuid;
+            event1.Name = nameEvent;
+
+            event1.IsActive__cSpecified = true;
+            event1.timestamp__cSpecified = true;
+            event1.timestamp__c = timestamp;
+            event1.Version__c = version;
+            event1.IsActive__c = isActive;
+
+
+
+            updates[0] = event1;
+
+
+            try
+            {
+                SaveResult[] saveResults = _sForceRef.update(updates);
+                foreach (SaveResult saveResult in saveResults)
+                {
+                    if (saveResult.success)
+                    {
+                        Console.WriteLine("Successfully updated Event ID: " +
+                                  saveResult.id);
+                    }
+                    else
+                    {
+                        Error[] errors = saveResult.errors;
+                        if (errors.Length > 0)
+                        {
+                            Console.WriteLine("Error: could not update " +
+                                      "Event ID " + saveResult.id + "."
+                                );
+                            Console.WriteLine("\tThe error reported was: (" +
+                                      errors[0].statusCode + ") " +
+                                      errors[0].message + "."
+                                );
+                        }
+                    }
+                }
+            }
+            catch (SoapException e)
+            {
+                Console.WriteLine("An unexpected error has occurred: " +
+                                               e.Message + "\n" + e.StackTrace);
+            }
+
+        }
+
         private static void updateRecordAccount(SforceService _sForceRef, String idAccount)
         {
             Account[] updates = new Account[1];
@@ -905,14 +1166,17 @@ namespace Integration_Project_CRM
                         XmlDocument doc = new XmlDocument();
                         doc.LoadXml(message);
                         XmlNodeList xmlList = doc.GetElementsByTagName("messageType");
-                        //string messageType = xmlList[0].InnerText.ToLower();
-                        string messageType = xmlList[0].InnerText;
+                        XmlNodeList sender = doc.GetElementsByTagName("sender");
 
-                        XmlNodeList uuid = doc.GetElementsByTagName("UUID");
+                        //________________________EVENT_____________________________
+                        XmlNodeList eventUUID = doc.GetElementsByTagName("UUID");
+                        XmlNodeList eventName = doc.GetElementsByTagName("name");
+
+                        //________________________LEAD______________________________
+                        XmlNodeList uuidLead = doc.GetElementsByTagName("UUID");
                         XmlNodeList fname = doc.GetElementsByTagName("firstname");
                         XmlNodeList lname = doc.GetElementsByTagName("lastname");
                         XmlNodeList email = doc.GetElementsByTagName("email");
-                        XmlNodeList sender = doc.GetElementsByTagName("sender");
                         XmlNodeList gdpr = doc.GetElementsByTagName("GDPR");
                         XmlNodeList timestamp = doc.GetElementsByTagName("timestamp");
                         XmlNodeList version = doc.GetElementsByTagName("version");
@@ -924,12 +1188,32 @@ namespace Integration_Project_CRM
                         XmlNodeList btw = doc.GetElementsByTagName("btw");
                         XmlNodeList extra = doc.GetElementsByTagName("extraField");
 
+                        //________________________Session___________________________
+                        XmlNodeList sessionName = doc.GetElementsByTagName("titel");
+                        XmlNodeList sessionUUID = doc.GetElementsByTagName("UUID");
+                        XmlNodeList UUIDofParentEvent = doc.GetElementsByTagName("event_UUID");
+                        XmlNodeList lokaal = doc.GetElementsByTagName("lokaal");
+                        XmlNodeList descr = doc.GetElementsByTagName("desc");
+                        XmlNodeList start = doc.GetElementsByTagName("start");
+                        XmlNodeList end = doc.GetElementsByTagName("end");
+
+
+
+
+                        //string messageType = xmlList[0].InnerText.ToLower();
+                        string messageType = xmlList[0].InnerText;
+
+
+
+
 
                         switch (messageType)
                         {
                             //CONTACT  
 
-                            case "conatact":
+                            case "contact":
+
+
 
 
                                 CreateContact(_sForceRef, "Sami", "Pete", email[0].InnerText, gsm[0].InnerText);
@@ -937,57 +1221,117 @@ namespace Integration_Project_CRM
 
                                 break;
 
-                            ////LEAD
-                            ///
-                            case "Visitorrr":
 
-                                string idRec = GetLeadID(_sForceRef, uuid[0].InnerText);
-
-                                if (idRec == "empty")
+                            case "Visitor":
+                                //check of verplichte velden niet leeg zijn
+                                if (uuidLead[0].InnerText =="" || fname[0].InnerText == "" || lname[0].InnerText == "" || email[0].InnerText =="" || timestamp[0].InnerText =="" || version[0].InnerText =="")
                                 {
-                                    Console.WriteLine("new data ...");
-                                    CreateLead(_sForceRef, messageType, uuid[0].InnerText, fname[0].InnerText, lname[0].InnerText, email[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), Convert.ToBoolean(isactive[0].InnerText), Convert.ToBoolean(banned[0].InnerText), gsm[0].InnerText, Convert.ToDateTime(geboortedatum[0].InnerText), btw[0].InnerText, Convert.ToBoolean(gdpr[0].InnerText));
+                                    Console.WriteLine("Not every required field is set..."+Environment.NewLine);
                                     break;
                                 }
                                 else
                                 {
-                                    if (Convert.ToInt32(version[0].InnerText) > GetLead(_sForceRef, uuid[0].InnerText).Version__c)
+                                    string idRec = GetLeadID(_sForceRef, uuidLead[0].InnerText);
+
+                                    //check of gekregen data niet al bestaat
+                                    if (idRec == "empty")
                                     {
-                                        updateRecordLead(_sForceRef, messageType,idRec, uuid[0].InnerText, fname[0].InnerText, lname[0].InnerText, email[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), Convert.ToBoolean(isactive[0].InnerText), Convert.ToBoolean(banned[0].InnerText), gsm[0].InnerText, Convert.ToDateTime(geboortedatum[0].InnerText), btw[0].InnerText, Convert.ToBoolean(gdpr[0].InnerText));
+                                        Console.WriteLine("new data received from " + sender[0].InnerText + Environment.NewLine);
+                                        CreateLead(_sForceRef, messageType, uuidLead[0].InnerText, fname[0].InnerText, lname[0].InnerText, email[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), Convert.ToBoolean(isactive[0].InnerText), Convert.ToBoolean(banned[0].InnerText), gsm[0].InnerText, Convert.ToDateTime(geboortedatum[0].InnerText), btw[0].InnerText, Convert.ToBoolean(gdpr[0].InnerText));
+                                        break;
                                     }
                                     else
                                     {
-                                        Console.WriteLine("version lower..");
+                                        // als data al bestaat gaat de versions vergelijken, indien nieuwe versie update
+                                        if (Convert.ToInt32(version[0].InnerText) > GetLead(_sForceRef, uuidLead[0].InnerText).Version__c)
+                                        {
+                                            updateRecordLead(_sForceRef, messageType, idRec, uuidLead[0].InnerText, fname[0].InnerText, lname[0].InnerText, email[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), Convert.ToBoolean(isactive[0].InnerText), Convert.ToBoolean(banned[0].InnerText), gsm[0].InnerText, Convert.ToDateTime(geboortedatum[0].InnerText), btw[0].InnerText, Convert.ToBoolean(gdpr[0].InnerText));
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("version lower or same as the already saved lead..." + Environment.NewLine);
+                                            break;
+                                        }
+
                                     }
+
+
 
                                 }
 
 
-                                // CreateLead(_sForceRef, "AazCCC", "Bonion", "Azeei", "zaee@shelby.com", DateTime.Now, 1, false, true, "23474352", new DateTime(1997, 08, 14), "235775", true);
+                            case "Event":
+
+                                //check of verplichte velden niet leeg zijn
+
+                                if (eventUUID[0].InnerText==""|| eventName[0].InnerText == "")
+                                {
+                                    Console.WriteLine("Not every required field is set..." + Environment.NewLine);
+                                    break;
+                                }
+                                else {
+
+                                    string idRecEvent = GetEventID(_sForceRef, eventUUID[0].InnerText);
 
 
-                                //OK--> CreateLead(_sForceRef, messageType, uuid[0].InnerText, fname[0].InnerText, lname[0].InnerText, email[0].InnerText, 234234, 2, true, true, gsm[0].InnerText, new DateTime(2000, 12, 12), btw[0].InnerText, true);
-                                //CreateLead(_sForceRef, messageType, uuid[0].InnerText, fname[0].InnerText, lname[0].InnerText, email[0].InnerText, 234234, 2, Convert.ToBoolean(isactive[0].InnerText), Convert.ToBoolean(banned[0].InnerText), gsm[0].InnerText, new DateTime(2000, 12, 12), btw[0].InnerText, Convert.ToBoolean(gdpr[0].InnerText));
+                                    //check of event al bestaat
+                                    if (idRecEvent == "empty")
+                                    {
+                                        Console.WriteLine("New data received from " + sender[0].InnerText + Environment.NewLine);
+                                        CreateEvent(_sForceRef, eventName[0].InnerText, eventUUID[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), Convert.ToBoolean(isactive[0].InnerText));
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        //update toevoegen ??  (adhv version__c)
+                                        if (Convert.ToInt32(version[0].InnerText) > GetEvent(_sForceRef, eventUUID[0].InnerText).Version__c)
+                                        {
+                                            updateRecordEvent(_sForceRef, messageType, idRecEvent, eventName[0].InnerText, eventUUID[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), Convert.ToBoolean(isactive[0].InnerText));
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("Version lower or same as the already saved event..." + Environment.NewLine);
+                                            break;
+                                        }
 
+
+                                    }
+
+                                }
+
+                                
+
+                            case "Session":
+
+                                //Si fields titel,uuid,lokaal,start,end -> vide -> error 
+                                //check si session existe deja?(UUID)
+                                //Si oui, update
+                                //Si non, create
+
+
+                                CreateSession(_sForceRef, sessionName[0].InnerText, UUIDofParentEvent[0].InnerText, sessionUUID[0].InnerText, descr[0].InnerText, lokaal[0].InnerText, Convert.ToDateTime(start[0].InnerText), Convert.ToDateTime(end[0].InnerText));
 
                                 break;
 
                             case "delete":
+                                XmlNodeList uuidDelete = doc.GetElementsByTagName("UUID");
 
 
-                                string id = GetLeadID(_sForceRef, uuid[0].InnerText);
+                                string id = GetLeadID(_sForceRef, uuidDelete[0].InnerText);
 
 
                                 if(id != "empty")
                                 {
-                                    if((GetLead(_sForceRef, uuid[0].InnerText).IsActive__c != true)&& (GetLead(_sForceRef, uuid[0].InnerText).gdpr__c != true))
+                                    if((GetLead(_sForceRef, uuidDelete[0].InnerText).IsActive__c != true)&& (GetLead(_sForceRef, uuidDelete[0].InnerText).gdpr__c != true))
                                     {
                                         Delete(_sForceRef, id);
                                         break;
                                     }
                                     else
                                     {
-                                        Console.WriteLine("Unable to delete (Still Active lead / gdpr = false");
+                                        Console.WriteLine("Unable to delete (Still Active lead / gdpr = false)");
                                         break;
                                     }
 
@@ -1012,8 +1356,11 @@ namespace Integration_Project_CRM
                                 //string idTeUpdatenRec = GetLeadID(_sForceRef, "John Wick", "wiki@gmail.com");
                                 //updateRecordLead(_sForceRef, idTeUpdatenRec, "DE3ACAAA", "John", "Weak", "jonny@wiki.com", 566465465, 3, false, false, "0000003", new DateTime(1960, 01, 04), "000005934", false);
 
-                                string idTeUpdatenRec = GetLeadID(_sForceRef, uuid[0].InnerText );
-                                updateRecordLead(_sForceRef, messageType ,idTeUpdatenRec, uuid[0].InnerText, fname[0].InnerText, lname[0].InnerText, email[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), Convert.ToBoolean(isactive[0].InnerText), Convert.ToBoolean(banned[0].InnerText), gsm[0].InnerText, Convert.ToDateTime(geboortedatum[0].InnerText), btw[0].InnerText, Convert.ToBoolean(gdpr[0].InnerText));
+
+
+                                //Inside logic of VISITOR
+                                //string idTeUpdatenRec = GetLeadID(_sForceRef, uuid[0].InnerText );
+                                //updateRecordLead(_sForceRef, messageType ,idTeUpdatenRec, uuid[0].InnerText, fname[0].InnerText, lname[0].InnerText, email[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), Convert.ToBoolean(isactive[0].InnerText), Convert.ToBoolean(banned[0].InnerText), gsm[0].InnerText, Convert.ToDateTime(geboortedatum[0].InnerText), btw[0].InnerText, Convert.ToBoolean(gdpr[0].InnerText));
 
                                 break;
 
