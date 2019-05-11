@@ -953,6 +953,8 @@ namespace Integration_Project_CRM
 
         }
 
+
+
         private static void updateRecordAccount(SforceService _sForceRef, String idAccount)
         {
             Account[] updates = new Account[1];
@@ -1222,6 +1224,7 @@ namespace Integration_Project_CRM
                                 break;
 
 
+
                             case "Visitor":
                                 //check of verplichte velden niet leeg zijn
                                 if (uuidLead[0].InnerText =="" || fname[0].InnerText == "" || lname[0].InnerText == "" || email[0].InnerText =="" || timestamp[0].InnerText =="" || version[0].InnerText =="")
@@ -1284,7 +1287,7 @@ namespace Integration_Project_CRM
                                     }
                                     else
                                     {
-                                        //update toevoegen ??  (adhv version__c)
+                                        //update als version hoger is en zelfde uuid  
                                         if (Convert.ToInt32(version[0].InnerText) > GetEvent(_sForceRef, eventUUID[0].InnerText).Version__c)
                                         {
                                             updateRecordEvent(_sForceRef, messageType, idRecEvent, eventName[0].InnerText, eventUUID[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), Convert.ToBoolean(isactive[0].InnerText));
@@ -1324,7 +1327,8 @@ namespace Integration_Project_CRM
 
                                 if(id != "empty")
                                 {
-                                    if((GetLead(_sForceRef, uuidDelete[0].InnerText).IsActive__c != true)&& (GetLead(_sForceRef, uuidDelete[0].InnerText).gdpr__c != true))
+                                    Lead l = GetLead(_sForceRef, uuidDelete[0].InnerText);
+                                    if ((l.IsActive__c != true)&& (l.gdpr__c != true))
                                     {
                                         Delete(_sForceRef, id);
                                         break;
