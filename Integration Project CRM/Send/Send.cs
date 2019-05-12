@@ -23,9 +23,9 @@ namespace Send
                 String xmlStr;
                 byte[] body;
                 //xmlStr = "<message><header><messageType>Visitor</messageType><description>Creation of a visitor</description><sender>front-end</sender><!-- crm --></header><datastructure><UUID>QSDF</UUID><name><firstname>Toretto</firstname><lastname>Dom</lastname></name><email>FF9@saAt.be</email><GDPR>false</GDPR><timestamp>1522113440</timestamp><version>1</version><isActive>false</isActive><banned>false</banned><!-- Not required fields --><geboortedatum>1997-08-12</geboortedatum><btw>BE15656464654</btw><gsm>01164165468</gsm><extraField></extraField></datastructure></message>";
-                xmlStr = "<message><header><messageType>Event</messageType><description>Creation of an Event</description><sender>front-end</sender><!-- crm --></header><datastructure><UUID>AZAZA</UUID><name>Footballistic</name><timestamp>1522113440</timestamp><version>2</version><isActive>true</isActive><extraField></extraField></datastructure></message>";
+                //xmlStr = "<message><header><messageType>Event</messageType><description>Creation of an Event</description><sender>front-end</sender><!-- crm --></header><datastructure><UUID>AZAZA</UUID><name>Footballistic</name><timestamp>1522113440</timestamp><version>2</version><isActive>true</isActive><extraField></extraField></datastructure></message>";
                 //xmlStr = "<message><header><messageType>Session</messageType><description>Creation of an session</description><sender>front-end</sender><!-- crm --></header><datastructure><UUID>AAAA</UUID><event_UUID>OOOO</event_UUID><titel>DrinkSession</titel><desc>BlaBliBlo description Bla Bla Bla</desc><lokaal>A205</lokaal><start>1997-08-10</start><end>1997-08-12</end><extraField></extraField></datastructure></message>";
-
+                xmlStr = "<message><header><messageType>GameGroup</messageType><description>Creation of an Gaming group</description><sender>front-end</sender><!-- crm --></header><datastructure><groupUUID>GROUPUUID</groupUUID><groupName>TESTGROUP</groupName><timestamp>1522113440</timestamp><version>1</version><isActive>true</isActive><gameUUID>GAMEUUID</gameUUID><GroupLeaderUUID>LEADERUUID</GroupLeaderUUID> <banned>false</banned><leden> <namen><naam>blo</naam><naam>blu</naam></namen></leden></datastructure></message>";
 
 
 
