@@ -205,6 +205,56 @@ namespace Integration_Project_CRM
 
 
         }
+        private static void CreateGamingGroup(SforceService _sForceRef, string name, string uuidGroup,string uuidLeader,string uuidGame, Int32 timestamp, Int32 version, bool isActive,bool banned)
+        {
+
+
+
+            GameGroup__c gameGroup = new GameGroup__c();
+
+            gameGroup.Name = name;
+            gameGroup.UUID_Group__c = uuidGroup;
+
+            gameGroup.timestamp__cSpecified = true;
+            gameGroup.timestamp__c = timestamp;
+
+            gameGroup.Version__cSpecified = true;
+            gameGroup.Version__c = version;
+
+            gameGroup.UUID_Game__c = uuidGame;
+            gameGroup.GroupLeader_UUID__c = uuidLeader;
+
+            gameGroup.IsActive__cSpecified = true;
+            gameGroup.Banned__cSpecified = true;
+
+            gameGroup.IsActive__c = isActive;
+            gameGroup.Banned__c = banned;
+
+
+        
+            
+
+
+
+            SaveResult[] createResult = _sForceRef.create(new sObject[] { gameGroup });
+
+            if (createResult[0].success)
+            {
+                string id = createResult[0].id;
+
+                Console.WriteLine("Gaming-group:" + name + " succesfully added ");
+
+            }
+            else
+            {
+                string resultaat = createResult[0].errors[0].message;
+                Console.WriteLine("Error, Gaming-group " + name + " not added. " + Environment.NewLine + "ERROR> " + resultaat);
+            }
+
+
+        }
+
+
 
 
         private static string GetLeadID(SforceService _sForceRef,string uuid)
@@ -313,6 +363,67 @@ namespace Integration_Project_CRM
 
                 }
                 Console.WriteLine("Query succesfully executed." + Environment.NewLine + "No Event with UUID: " + uuid + " founded in SalesForce...");
+                return "empty";
+
+            }
+            catch (SoapException e)
+            {
+                Console.WriteLine("An unexpected error has occurred: " +
+                                           e.Message + "\n" + e.StackTrace);
+                return "empty";
+
+            }
+
+        }
+        
+
+        private static string GetGamingGroupID(SforceService _sForceRef, string uuid)
+        {
+            QueryResult qResult = null;
+            try
+            {
+                String soqlQuery = "SELECT id FROM GameGroup__c WHERE UUID_Group__c='" + uuid + "'";
+                qResult = _sForceRef.query(soqlQuery);
+                Boolean done = false;
+                if (qResult.size > 0)
+                {
+                    Console.WriteLine("Gaming Group with UUID: " + uuid + " has been found!");
+                    while (!done)
+                    {
+                        sObject[] records = qResult.records;
+                        for (int i = 0; i < records.Length; i++)
+                        {
+                            GameGroup__c g1 = (GameGroup__c)records[i];
+                            String id = g1.Id;
+                            if (id != null)
+                            {
+                                Console.WriteLine("Gaming Group with following UUID" + uuid + " has the following SalesForce-ID: " + id);
+                                return id;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Gaming Group with following UUID" + uuid + " has no SalesForce-ID ..." + Environment.NewLine + "ERROR");
+                                return "empty";
+                            }
+
+                        }
+                        if (qResult.done)
+                        {
+                            done = true;
+                        }
+                        else
+                        {
+                            qResult = _sForceRef.queryMore(qResult.queryLocator);
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No Gaming Group found.");
+                    return "empty";
+
+                }
+                Console.WriteLine("Query succesfully executed." + Environment.NewLine + "No Gaming Group with UUID: " + uuid + " founded in SalesForce...");
                 return "empty";
 
             }
@@ -626,6 +737,70 @@ namespace Integration_Project_CRM
 
 
         }
+        private static GameGroup__c GetGamingGroup(SforceService _sForceRef, string uuid)
+        {
+
+            QueryResult qResult = null;
+            try
+            {
+                String soqlQuery = "SELECT id, UUID_Group__c, Name, Timestamp__c, Version__c, IsActive__c,UUID_Game__C,GroupLeader_UUID__c,Banned__c FROM GameGroup__c WHERE UUID_Group__c ='" + uuid + "'";
+                qResult = _sForceRef.query(soqlQuery);
+                Boolean done = false;
+                if (qResult.size > 0)
+                {
+                    Console.WriteLine("Logged-in user can see a total of "
+                       + qResult.size + " Gaming Group(s) records.");
+                    while (!done)
+                    {
+                        sObject[] records = qResult.records;
+                        for (int i = 0; i < records.Length; i++)
+                        {
+                            GameGroup__c e1 = (GameGroup__c)records[i];
+
+                            if (e1 != null)
+                            {
+                                Console.WriteLine("Gaming Group " + uuid + " found");
+                                return e1;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Gaming Group " + uuid + " " + (i + 1) + ": " + "ERROR");
+                                return null;
+                            }
+
+                        }
+                        if (qResult.done)
+                        {
+                            done = true;
+                        }
+                        else
+                        {
+                            qResult = _sForceRef.queryMore(qResult.queryLocator);
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No records found.");
+                    return null;
+
+                }
+                Console.WriteLine("\nQuery succesfully executed.");
+                return null;
+
+            }
+            catch (SoapException e)
+            {
+                Console.WriteLine("An unexpected error has occurred: " +
+                                           e.Message + "\n" + e.StackTrace);
+                return null;
+
+            }
+
+
+
+        }
+
 
 
         private static Contact GetContact(SforceService _sForceRef, string searchingContactName, string searchingContactEmail)
@@ -818,7 +993,7 @@ namespace Integration_Project_CRM
 
         }
 
-
+        
         private static void updateRecordLead(SforceService _sForceRef,string messageType ,string idLead, string uuid, string firstName, string lastName, string email, Int32 timestampLead, double versionLead, bool isActive, bool isBanned, string gsm, DateTime gebDatum, string btwNr, bool gdpr)
         {
             Lead[] updates = new Lead[1];
@@ -936,6 +1111,74 @@ namespace Integration_Project_CRM
                         {
                             Console.WriteLine("Error: could not update " +
                                       "Event ID " + saveResult.id + "."
+                                );
+                            Console.WriteLine("\tThe error reported was: (" +
+                                      errors[0].statusCode + ") " +
+                                      errors[0].message + "."
+                                );
+                        }
+                    }
+                }
+            }
+            catch (SoapException e)
+            {
+                Console.WriteLine("An unexpected error has occurred: " +
+                                               e.Message + "\n" + e.StackTrace);
+            }
+
+        }
+        private static void updateRecordGamingGroup(SforceService _sForceRef, string messageType, string idGameGroup ,string name, string uuidGroup, string uuidLeader, string uuidGame, Int32 timestamp, Int32 version, bool isActive, bool banned)
+        {
+            GameGroup__c[] updates = new GameGroup__c[1];
+
+
+
+
+
+            GameGroup__c gameGroup = new GameGroup__c();
+            gameGroup.Id = idGameGroup;
+
+            gameGroup.Name = name;
+            gameGroup.UUID_Group__c = uuidGroup;
+
+            gameGroup.timestamp__cSpecified = true;
+            gameGroup.timestamp__c = timestamp;
+
+            gameGroup.Version__cSpecified = true;
+            gameGroup.Version__c = version;
+
+            gameGroup.UUID_Game__c = uuidGame;
+            gameGroup.GroupLeader_UUID__c = uuidLeader;
+
+            gameGroup.IsActive__cSpecified = true;
+            gameGroup.Banned__cSpecified = true;
+
+            gameGroup.IsActive__c = isActive;
+            gameGroup.Banned__c = banned;
+
+
+
+
+            updates[0] = gameGroup;
+
+
+            try
+            {
+                SaveResult[] saveResults = _sForceRef.update(updates);
+                foreach (SaveResult saveResult in saveResults)
+                {
+                    if (saveResult.success)
+                    {
+                        Console.WriteLine("Successfully updated Gaming Group ID: " +
+                                  saveResult.id);
+                    }
+                    else
+                    {
+                        Error[] errors = saveResult.errors;
+                        if (errors.Length > 0)
+                        {
+                            Console.WriteLine("Error: could not update " +
+                                      "Gaming Group ID " + saveResult.id + "."
                                 );
                             Console.WriteLine("\tThe error reported was: (" +
                                       errors[0].statusCode + ") " +
@@ -1202,6 +1445,16 @@ namespace Integration_Project_CRM
 
 
 
+                        XmlNodeList uuidGroup = doc.GetElementsByTagName("groupUUID");
+                        XmlNodeList uuidGame = doc.GetElementsByTagName("gameUUID");
+                        XmlNodeList uuidLeader = doc.GetElementsByTagName("GroupLeaderUUID");
+                        XmlNodeList gamegroupname = doc.GetElementsByTagName("groupName");
+
+
+
+
+
+
                         //string messageType = xmlList[0].InnerText.ToLower();
                         string messageType = xmlList[0].InnerText;
 
@@ -1212,7 +1465,7 @@ namespace Integration_Project_CRM
                         switch (messageType)
                         {
                             //CONTACT  
-
+                            /* Gaan we die uiteindelijk nog gebruiken???
                             case "contact":
 
 
@@ -1221,11 +1474,50 @@ namespace Integration_Project_CRM
                                 CreateContact(_sForceRef, "Sami", "Pete", email[0].InnerText, gsm[0].InnerText);
                                 //CreateContact(_sForceRef, fname[0].InnerText, lname[0].InnerText, email[0].InnerText, gsm[0].InnerText);
 
-                                break;
+                                break;*/
+
+                            case "GameGroup":
+
+                                if (uuidGroup[0].InnerText == "" || uuidLeader[0].InnerText == "" || uuidGame[0].InnerText == "")
+                                {
+                                    Console.WriteLine("Not every required field is set..." + Environment.NewLine);
+                                    break;
+                                }
+                                else
+                                {
+
+                                    string idRecGamingGroup = GetGamingGroupID(_sForceRef, uuidGroup[0].InnerText);
+
+
+                                    //check of event al bestaat
+                                    if (idRecGamingGroup == "empty")
+                                    {
+                                        Console.WriteLine("New data received from " + sender[0].InnerText + Environment.NewLine);
+                                        CreateGamingGroup(_sForceRef, gamegroupname[0].InnerText, uuidGroup[0].InnerText, uuidLeader[0].InnerText, uuidGame[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), Convert.ToBoolean(isactive[0].InnerText), Convert.ToBoolean(banned[0].InnerText));
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        //update als version hoger is en zelfde uuid  
+                                        if (Convert.ToInt32(version[0].InnerText) > GetGamingGroup(_sForceRef, uuidGroup[0].InnerText).Version__c)
+                                        {
+                                            updateRecordGamingGroup(_sForceRef, messageType, idRecGamingGroup, gamegroupname[0].InnerText, uuidGroup[0].InnerText, uuidLeader[0].InnerText, uuidGame[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), Convert.ToBoolean(isactive[0].InnerText), Convert.ToBoolean(banned[0].InnerText));
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("Version lower or same as the already saved event..." + Environment.NewLine);
+                                            break;
+                                        }
+
+
+                                    }
+
+                                }
 
 
 
-                            case "Visitor":
+                            case "Visitorr":
                                 //check of verplichte velden niet leeg zijn
                                 if (uuidLead[0].InnerText =="" || fname[0].InnerText == "" || lname[0].InnerText == "" || email[0].InnerText =="" || timestamp[0].InnerText =="" || version[0].InnerText =="")
                                 {
@@ -1264,7 +1556,7 @@ namespace Integration_Project_CRM
                                 }
 
 
-                            case "Event":
+                            case "Eventt":
 
                                 //check of verplichte velden niet leeg zijn
 
