@@ -4250,23 +4250,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\MediaMonster\\.nuget\\packages\\": {},
+    "C:\\Users\\bouch\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\MediaMonster\\source\\repos\\Integration Project CRM\\Integration Project CRM\\Send\\Send.csproj",
+      "projectUniqueName": "C:\\Users\\bouch\\Downloads\\crm 12\\Integration Project CRM\\Send\\Send.csproj",
       "projectName": "Send",
-      "projectPath": "C:\\Users\\MediaMonster\\source\\repos\\Integration Project CRM\\Integration Project CRM\\Send\\Send.csproj",
-      "packagesPath": "C:\\Users\\MediaMonster\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\MediaMonster\\source\\repos\\Integration Project CRM\\Integration Project CRM\\Send\\obj\\",
+      "projectPath": "C:\\Users\\bouch\\Downloads\\crm 12\\Integration Project CRM\\Send\\Send.csproj",
+      "packagesPath": "C:\\Users\\bouch\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\bouch\\Downloads\\crm 12\\Integration Project CRM\\Send\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\MediaMonster\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\bouch\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
