@@ -39,6 +39,7 @@ namespace Integration_Project_CRM
             l1.IsActive__c = isActive;
 
             l1.IsBanned__cSpecified = true;
+
             l1.IsBanned__c = isBanned;
 
             l1.Company = messageType;
@@ -1577,6 +1578,13 @@ namespace Integration_Project_CRM
                         XmlNodeList uuidLeader = doc.GetElementsByTagName("GroupLeaderUUID");
                         XmlNodeList gamegroupname = doc.GetElementsByTagName("groupName");
 
+
+
+                        bool gdprbool = Convert.ToInt32(gdpr[0].InnerText) != 0;
+                        bool isActivebool = Convert.ToInt32(isactive[0].InnerText) != 0;
+                        bool bannedbool = Convert.ToInt32(banned[0].InnerText) != 0;
+
+
                         //string messageType = xmlList[0].InnerText.ToLower();
                         string messageType = xmlList[0].InnerText;
 
@@ -1605,8 +1613,11 @@ namespace Integration_Project_CRM
                                     //check of event al bestaat
                                     if (idRecGamingGroup == "empty")
                                     {
-                                        Console.WriteLine("New data received from: " + sender[0].InnerText + Environment.NewLine);
-                                        CreateGamingGroup(_sForceRef, gamegroupname[0].InnerText, uuidGroup[0].InnerText, uuidLeader[0].InnerText, uuidGame[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), Convert.ToBoolean(isactive[0].InnerText), Convert.ToBoolean(banned[0].InnerText));
+
+                                        Console.WriteLine("New data received from " + sender[0].InnerText + Environment.NewLine);
+                                        CreateGamingGroup(_sForceRef, gamegroupname[0].InnerText, uuidGroup[0].InnerText, uuidLeader[0].InnerText, uuidGame[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), isActivebool, bannedbool);
+
+                                        
                                         break;
                                     }
                                     else
@@ -1614,7 +1625,7 @@ namespace Integration_Project_CRM
                                         //update als version hoger is en zelfde uuid  
                                         if (Convert.ToInt32(version[0].InnerText) > GetGamingGroup(_sForceRef, uuidGroup[0].InnerText).Version__c)
                                         {
-                                            updateRecordGamingGroup(_sForceRef, messageType, idRecGamingGroup, gamegroupname[0].InnerText, uuidGroup[0].InnerText, uuidLeader[0].InnerText, uuidGame[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), Convert.ToBoolean(isactive[0].InnerText), Convert.ToBoolean(banned[0].InnerText));
+                                            updateRecordGamingGroup(_sForceRef, messageType, idRecGamingGroup, gamegroupname[0].InnerText, uuidGroup[0].InnerText, uuidLeader[0].InnerText, uuidGame[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), isActivebool, bannedbool);
                                             break;
                                         }
                                         else
@@ -1642,8 +1653,10 @@ namespace Integration_Project_CRM
                                     //check of gekregen data niet al bestaat
                                     if (idRec == "empty")
                                     {
-                                        Console.WriteLine("New data received from " + sender[0].InnerText + Environment.NewLine);
-                                        CreateLead(_sForceRef, messageType, uuidLead[0].InnerText, fname[0].InnerText, lname[0].InnerText, email[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), Convert.ToBoolean(isactive[0].InnerText), Convert.ToBoolean(banned[0].InnerText), gsm[0].InnerText, Convert.ToDateTime(geboortedatum[0].InnerText), btw[0].InnerText, Convert.ToBoolean(gdpr[0].InnerText));
+
+                                        Console.WriteLine("new data received from " + sender[0].InnerText + Environment.NewLine);
+                                        CreateLead(_sForceRef, messageType, uuidLead[0].InnerText, fname[0].InnerText, lname[0].InnerText, email[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), isActivebool, bannedbool, gsm[0].InnerText, Convert.ToDateTime(geboortedatum[0].InnerText), btw[0].InnerText, gdprbool);
+
                                         break;
                                     }
                                     else
@@ -1651,7 +1664,7 @@ namespace Integration_Project_CRM
                                         // als data al bestaat gaat de versions vergelijken, indien nieuwe versie update
                                         if (Convert.ToInt32(version[0].InnerText) > GetLead(_sForceRef, uuidLead[0].InnerText).Version__c)
                                         {
-                                            updateRecordLead(_sForceRef, messageType, idRec, uuidLead[0].InnerText, fname[0].InnerText, lname[0].InnerText, email[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), Convert.ToBoolean(isactive[0].InnerText), Convert.ToBoolean(banned[0].InnerText), gsm[0].InnerText, Convert.ToDateTime(geboortedatum[0].InnerText), btw[0].InnerText, Convert.ToBoolean(gdpr[0].InnerText));
+                                            updateRecordLead(_sForceRef, messageType, idRec, uuidLead[0].InnerText, fname[0].InnerText, lname[0].InnerText, email[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), isActivebool, bannedbool, gsm[0].InnerText, Convert.ToDateTime(geboortedatum[0].InnerText), btw[0].InnerText, gdprbool);
                                             break;
                                         }
                                         else
@@ -1664,7 +1677,7 @@ namespace Integration_Project_CRM
 
                                 }
 
-                                // Controleer MessageType nog
+
                             case "CreateEvent":
 
                                 //check of verplichte velden niet leeg zijn
@@ -1683,7 +1696,7 @@ namespace Integration_Project_CRM
                                     if (idRecEvent == "empty")
                                     {
                                         Console.WriteLine("New data received from " + sender[0].InnerText + Environment.NewLine);
-                                        CreateEvent(_sForceRef, eventName[0].InnerText, eventUUID[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), Convert.ToBoolean(isactive[0].InnerText));
+                                        CreateEvent(_sForceRef, eventName[0].InnerText, eventUUID[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), isActivebool);
                                         break;
                                     }
                                     else
@@ -1691,7 +1704,7 @@ namespace Integration_Project_CRM
                                         //update als version hoger is en zelfde uuid  
                                         if (Convert.ToInt32(version[0].InnerText) > GetEvent(_sForceRef, eventUUID[0].InnerText).Version__c)
                                         {
-                                            updateRecordEvent(_sForceRef, messageType, idRecEvent, eventName[0].InnerText, eventUUID[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), Convert.ToBoolean(isactive[0].InnerText));
+                                            updateRecordEvent(_sForceRef, messageType, idRecEvent, eventName[0].InnerText, eventUUID[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), isActivebool);
                                             break;
                                         }
                                         else
