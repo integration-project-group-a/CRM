@@ -439,6 +439,67 @@ namespace Integration_Project_CRM
         }
 
 
+        private static string GetSessionID(SforceService _sForceRef, string uuid)
+        {
+            QueryResult qResult = null;
+            try
+            {
+                String soqlQuery = "SELECT Id FROM SSession__c WHERE UUID__c='" + uuid + "'";
+                qResult = _sForceRef.query(soqlQuery);
+                Boolean done = false;
+                if (qResult.size > 0)
+                {
+                    Console.WriteLine("Session with UUID: " + uuid + " has been found!");
+                    while (!done)
+                    {
+                        sObject[] records = qResult.records;
+                        for (int i = 0; i < records.Length; i++)
+                        {
+                            SSession__c s1 = (SSession__c)records[i];
+                            String id = s1.Id;
+                            if (id != null)
+                            {
+                                Console.WriteLine("Session with following UUID" + uuid + " has the following SalesForce-ID: " + id);
+                                return id;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Session with following UUID" + uuid + " has no SalesForce-ID ..." + Environment.NewLine + "ERROR");
+                                return "empty";
+                            }
+
+                        }
+                        if (qResult.done)
+                        {
+                            done = true;
+                        }
+                        else
+                        {
+                            qResult = _sForceRef.queryMore(qResult.queryLocator);
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No Event found.");
+                    return "empty";
+
+                }
+                Console.WriteLine("Query succesfully executed." + Environment.NewLine + "No Event with UUID: " + uuid + " founded in SalesForce...");
+                return "empty";
+
+            }
+            catch (SoapException e)
+            {
+                Console.WriteLine("An unexpected error has occurred: " +
+                                           e.Message + "\n" + e.StackTrace);
+                return "empty";
+
+            }
+
+        }
+
+
 
 
         private static string GetAccountID(SforceService _sForceRef, string searchingAccountName, string searchingAccountPhone)
@@ -738,6 +799,72 @@ namespace Integration_Project_CRM
 
 
         }
+
+        /* To Be Continued
+        private static SSession__c GetSession(SforceService _sForceRef, string uuid)
+        {
+
+            QueryResult qResult = null;
+            try
+            {
+                String soqlQuery = "SELECT  UUID__c, Name, Timestamp__c, Version__c, IsActive__c FROM EEvent__c WHERE UUID__c ='" + uuid + "'";
+                qResult = _sForceRef.query(soqlQuery);
+                Boolean done = false;
+                if (qResult.size > 0)
+                {
+                    Console.WriteLine("Logged-in user can see a total of "
+                       + qResult.size + " event records.");
+                    while (!done)
+                    {
+                        sObject[] records = qResult.records;
+                        for (int i = 0; i < records.Length; i++)
+                        {
+                            EEvent__c e1 = (EEvent__c)records[i];
+
+                            if (e1 != null)
+                            {
+                                Console.WriteLine("Event " + uuid + " found");
+                                return e1;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Event " + uuid + " " + (i + 1) + ": " + "ERROR");
+                                return null;
+                            }
+
+                        }
+                        if (qResult.done)
+                        {
+                            done = true;
+                        }
+                        else
+                        {
+                            qResult = _sForceRef.queryMore(qResult.queryLocator);
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No records found.");
+                    return null;
+
+                }
+                Console.WriteLine("\nQuery succesfully executed.");
+                return null;
+
+            }
+            catch (SoapException e)
+            {
+                Console.WriteLine("An unexpected error has occurred: " +
+                                           e.Message + "\n" + e.StackTrace);
+                return null;
+
+            }
+
+
+
+        }*/
+
         private static GameGroup__c GetGamingGroup(SforceService _sForceRef, string uuid)
         {
 
@@ -1444,7 +1571,7 @@ namespace Integration_Project_CRM
                         XmlNodeList end = doc.GetElementsByTagName("end");
 
 
-
+                        //______________________Game_________________________
 
                         XmlNodeList uuidGroup = doc.GetElementsByTagName("groupUUID");
                         XmlNodeList uuidGame = doc.GetElementsByTagName("gameUUID");
@@ -1452,32 +1579,23 @@ namespace Integration_Project_CRM
                         XmlNodeList gamegroupname = doc.GetElementsByTagName("groupName");
 
 
+
                         bool gdprbool = Convert.ToInt32(gdpr[0].InnerText) != 0;
                         bool isActivebool = Convert.ToInt32(isactive[0].InnerText) != 0;
                         bool bannedbool = Convert.ToInt32(banned[0].InnerText) != 0;
 
 
-
                         //string messageType = xmlList[0].InnerText.ToLower();
                         string messageType = xmlList[0].InnerText;
 
-
-
-
-
                         switch (messageType)
                         {
-                            //CONTACT  
-                            /* Gaan we die uiteindelijk nog gebruiken???
-                            case "contact":
+                            /// Als backup gehouden van oude versie, nadien nog even aanpassen zoals de rest als alles zeker werkt en wordt vervanging van Lead
+                            case "Contact":
+                                                   
+                                CreateContact(_sForceRef, fname[0].InnerText, lname[0].InnerText, email[0].InnerText, gsm[0].InnerText);
 
-
-
-
-                                CreateContact(_sForceRef, "Sami", "Pete", email[0].InnerText, gsm[0].InnerText);
-                                //CreateContact(_sForceRef, fname[0].InnerText, lname[0].InnerText, email[0].InnerText, gsm[0].InnerText);
-
-                                break;*/
+                                break;
 
                             case "GameGroup":
 
@@ -1495,8 +1613,11 @@ namespace Integration_Project_CRM
                                     //check of event al bestaat
                                     if (idRecGamingGroup == "empty")
                                     {
+
                                         Console.WriteLine("New data received from " + sender[0].InnerText + Environment.NewLine);
                                         CreateGamingGroup(_sForceRef, gamegroupname[0].InnerText, uuidGroup[0].InnerText, uuidLeader[0].InnerText, uuidGame[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), isActivebool, bannedbool);
+
+                                        
                                         break;
                                     }
                                     else
@@ -1509,7 +1630,7 @@ namespace Integration_Project_CRM
                                         }
                                         else
                                         {
-                                            Console.WriteLine("Version lower or same as the already saved event..." + Environment.NewLine);
+                                            Console.WriteLine("Cannot be updated since Version is equal or lower to currently saved Record." + Environment.NewLine);
                                             break;
                                         }
 
@@ -1517,8 +1638,6 @@ namespace Integration_Project_CRM
                                     }
 
                                 }
-
-
 
                             case "Visitor":
                                 //check of verplichte velden niet leeg zijn
@@ -1534,8 +1653,10 @@ namespace Integration_Project_CRM
                                     //check of gekregen data niet al bestaat
                                     if (idRec == "empty")
                                     {
+
                                         Console.WriteLine("new data received from " + sender[0].InnerText + Environment.NewLine);
                                         CreateLead(_sForceRef, messageType, uuidLead[0].InnerText, fname[0].InnerText, lname[0].InnerText, email[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), isActivebool, bannedbool, gsm[0].InnerText, Convert.ToDateTime(geboortedatum[0].InnerText), btw[0].InnerText, gdprbool);
+
                                         break;
                                     }
                                     else
@@ -1548,13 +1669,11 @@ namespace Integration_Project_CRM
                                         }
                                         else
                                         {
-                                            Console.WriteLine("version lower or same as the already saved lead..." + Environment.NewLine);
+                                            Console.WriteLine("Cannot be updated since Version is equal or lower to currently saved Record." + Environment.NewLine);
                                             break;
                                         }
 
                                     }
-
-
 
                                 }
 
@@ -1590,7 +1709,58 @@ namespace Integration_Project_CRM
                                         }
                                         else
                                         {
-                                            Console.WriteLine("Version lower or same as the already saved event..." + Environment.NewLine);
+                                            Console.WriteLine("Cannot be updated since Version is equal or lower to currently saved Record." + Environment.NewLine);
+                                            break;
+                                        }
+                                    }
+
+                                }
+
+                                /* TO BE CONTINUED
+
+                            case "CreateSession":
+
+                                //Si fields titel,uuid,lokaal,start,end -> vide -> error 
+                                //check si session existe deja?(UUID)
+                                //Si oui, update
+                                //Si non, create
+
+                                //************************
+                                //  CreateSession(_sForceRef, sessionName[0].InnerText, UUIDofParentEvent[0].InnerText, sessionUUID[0].InnerText, descr[0].InnerText, lokaal[0].InnerText, Convert.ToDateTime(start[0].InnerText), Convert.ToDateTime(end[0].InnerText));
+                                //************************
+
+
+                                //check of verplichte velden niet leeg zijn
+
+                                if (sessionUUID[0].InnerText == "" || sessionName[0].InnerText == "")
+                                {
+                                    Console.WriteLine("Not every required field is set..." + Environment.NewLine);
+                                    break;
+                                }
+                                else
+                                {
+
+                                    string idRecSession = GetSessionID(_sForceRef, sessionUUID[0].InnerText);
+
+
+                                    //check of event al bestaat
+                                    if (idRecSession == "empty")
+                                    {
+                                        Console.WriteLine("New data received from: " + sender[0].InnerText + Environment.NewLine);
+                                        CreateSession(_sForceRef, sessionName[0].InnerText, UUIDofParentEvent[0].InnerText, sessionUUID[0].InnerText, descr[0].InnerText, lokaal[0].InnerText, Convert.ToDateTime(start[0].InnerText), Convert.ToDateTime(end[0].InnerText));
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        //update als version hoger is en zelfde uuid  
+                                        if (Convert.ToInt32(version[0].InnerText) > GetEvent(_sForceRef, eventUUID[0].InnerText).Version__c)
+                                        {
+                                            updateRecordEvent(_sForceRef, messageType, idRecEvent, eventName[0].InnerText, eventUUID[0].InnerText, Convert.ToInt32(timestamp[0].InnerText), Convert.ToInt32(version[0].InnerText), Convert.ToBoolean(isactive[0].InnerText));
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("Cannot be updated since Version is equal or lower to currently saved Record." + Environment.NewLine);
                                             break;
                                         }
 
@@ -1599,21 +1769,13 @@ namespace Integration_Project_CRM
 
                                 }
 
-                                
-
-                            case "Session":
-
-                                //Si fields titel,uuid,lokaal,start,end -> vide -> error 
-                                //check si session existe deja?(UUID)
-                                //Si oui, update
-                                //Si non, create
-
-
-                                CreateSession(_sForceRef, sessionName[0].InnerText, UUIDofParentEvent[0].InnerText, sessionUUID[0].InnerText, descr[0].InnerText, lokaal[0].InnerText, Convert.ToDateTime(start[0].InnerText), Convert.ToDateTime(end[0].InnerText));
 
                                 break;
+                                */
 
-                            case "delete":
+
+                            // Dit nog uitwerken ivm GDPR, aangezien deze case de records PERMANENT verwijderd uit SalesForce.
+                            case "Delete":
                                 XmlNodeList uuidDelete = doc.GetElementsByTagName("UUID");
 
 
@@ -1650,7 +1812,9 @@ namespace Integration_Project_CRM
 
                                 break;
 
-                            case "update":
+
+                            // Hebben we dit wel nog nodig?
+                            case "Update":
 
                                 //string idTeUpdatenRec = GetLeadID(_sForceRef, "John Wick", "wiki@gmail.com");
                                 //updateRecordLead(_sForceRef, idTeUpdatenRec, "DE3ACAAA", "John", "Weak", "jonny@wiki.com", 566465465, 3, false, false, "0000003", new DateTime(1960, 01, 04), "000005934", false);
@@ -1697,14 +1861,6 @@ namespace Integration_Project_CRM
                 _sForceRef = null;
                 Console.WriteLine("Exception occured " + e.Message.ToString());
             }
-
-
-
-
-
-
-
-
 
         }
     }
